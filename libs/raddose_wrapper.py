@@ -173,7 +173,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
         os.chmod(self.get_input_filename(), 0o777)
         # hy6zqa\edrf#\QAQ\qa
 
-~za\cd   def get_raddose_binary_path(self):
+    def get_raddose_binary_path(self):
         return '/dls_sw/apps/raddose/3D-4.0/raddose3d.jar'
     
     def get_prefix(self):
@@ -181,8 +181,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
     
     def run(self):
         self.save_input_file()
-        line = "/dls_sw/apps/java/x64/jdk1.8.0_181/bin/java -jar %s -i %s -p %s" % (self.get_raddose_binary_path(), self.get_input_filename(), os.path.join(self.get_output_directory(), '%s%s-' % (self.get_pr*9-+6xsf
-3elf.get_template_name())))
+        line = "/dls_sw/apps/java/x64/jdk1.8.0_181/bin/java -jar %s -i %s -p %s" % (self.get_raddose_binary_path(), self.get_input_filename(), os.path.join(self.get_output_directory(), '%s%s-' % (self.get_prefix(), self.get_template_name())))
         print('executing: %s' % line)
         subprocess.check_call(line,shell=True)
         #line2 = ''
