@@ -78,7 +78,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
 # AngularResolution 2     # Only change from the defaults when using very
                           # small wedges, e.g 5°.
     '''
-    input_filename_template = '{size_x:.1f}_{size_y:.1f}_{size_z:.1f}_{unit_cell_a:.1f}_{unit_cell_b:.1f}_{unit_cell_c:.1f}_{number_of_monomers:d}_{number_of_residues:d}_{elements_protein_concentration:s}_{elements_solvent_concentration:s}_{solvent_fraction:.2f}_{flux:.1e}_{beam_size_x:.1f}_{beam_size_y:.1f}_{photon_energy:.2f}_{oscillation_start:.1f}_{oscillation_end:.1f}_{total_exposure_time:.1f}.txt'
+    input_filename_template = '{size_x:.1f}_{size_y:.1f}_{size_z:.1f}_{unit_cell_a:.1f}_{unit_cell_b:.1f}_{unit_cell_c:.1f}_{number_of_monomers:d}_{number_of_residues:d}_{elements_protein_concentration:f}_{elements_solvent_concentration:f}_{solvent_fraction:.2f}_{flux:.1e}_{beam_size_x:.1f}_{beam_size_y:.1f}_{photon_energy:.2f}_{oscillation_start:.1f}_{oscillation_end:.1f}_{total_exposure_time:.1f}.txt'
     
     def __init__(self,
                  size_x=30.,
@@ -100,7 +100,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
                  oscillation_end=360.,
                  total_exposure_time=90.,
                  prefix='output-',
-                 output_directory='/nfs/data2/raddose3d',
+                 output_directory='/scratch/raddose3d/',
                  verbose=False,):
         
         self.size_x = size_x
@@ -206,14 +206,14 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
         lines = [i for i in a]
         keys = [i.strip() for i in lines[0]]
         values = [float(i.strip()) for i in lines[1]]
-        d = dict(zip(keys, values))
+        self.data = dict(zip(keys, values))
         f.close()
         if self.verbose:
             print("Data is")
-            pprint(d)
+            pprint(self.data)
         print("Goint to write to %s" %(self.get_summary_pickle_name()))
         summary_pickle_file = open(self.get_summary_pickle_name(), 'wb')
-        pickle.dump(d, summary_pickle_file)
+        pickle.dump(self.data, summary_pickle_file)
         summary_pickle_file.close()
         os.chmod(self.get_summary_pickle_name(), 0o777)
  
