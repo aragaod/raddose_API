@@ -22,7 +22,7 @@ Crystal
 
 Type Cuboid             # Cuboid
 Dimensions {size_x} {size_y} {size_z}  # Dimensions of the crystal in X,Y,Z in µm.
-PixelsPerMicron 0.1     # The computational resolution
+PixelsPerMicron {comp_reso}      # The computational resolution
 AbsCoefCalc  RD3D       # Tells RADDOSE-3D how to calculate the
                         # Absorption coefficients
 
@@ -75,15 +75,16 @@ Wedge {oscillation_start} {oscillation_end}
                           # Start < End
 ExposureTime {total_exposure_time} # Total time for entire angular range in seconds
 
-# AngularResolution 2     # Only change from the defaults when using very
+#AngularResolution 3     # Only change from the defaults when using very
                           # small wedges, e.g 5°.
     '''
-    input_filename_template = '{size_x:.1f}_{size_y:.1f}_{size_z:.1f}_{unit_cell_a:.1f}_{unit_cell_b:.1f}_{unit_cell_c:.1f}_{number_of_monomers:d}_{number_of_residues:d}_{elements_protein_concentration:f}_{elements_solvent_concentration:f}_{solvent_fraction:.2f}_{flux:.1e}_{beam_size_x:.1f}_{beam_size_y:.1f}_{photon_energy:.2f}_{oscillation_start:.1f}_{oscillation_end:.1f}_{total_exposure_time:.1f}.txt'
+    input_filename_template = '{size_x:.1f}_{size_y:.1f}_{size_z:.1f}_{comp_reso:.1f}_{unit_cell_a:.1f}_{unit_cell_b:.1f}_{unit_cell_c:.1f}_{number_of_monomers:d}_{number_of_residues:d}_{elements_protein_concentration:f}_{elements_solvent_concentration:f}_{solvent_fraction:.2f}_{flux:.2s}_{beam_size_x:.1f}_{beam_size_y:.1f}_{photon_energy:.2f}_{oscillation_start:.1f}_{oscillation_end:.1f}_{total_exposure_time:.1f}.txt'
     
     def __init__(self,
                  size_x=30.,
                  size_y=30.,
                  size_z=30.,
+                 comp_reso=0.5,
                  unit_cell_a=78.,
                  unit_cell_b=78.,
                  unit_cell_c=36.,
@@ -102,10 +103,12 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
                  prefix='output-',
                  output_directory='/scratch/raddose3d/',
                  verbose=False,):
+
         
         self.size_x = size_x
         self.size_y = size_y
         self.size_z = size_z
+        self.comp_reso = comp_reso
         self.unit_cell_a = unit_cell_a
         self.unit_cell_b = unit_cell_b
         self.unit_cell_c = unit_cell_c
@@ -135,6 +138,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
                       "size_x": self.size_x,
                       "size_y": self.size_y,
                       "size_z": self.size_z,
+                      "comp_reso": self.comp_reso,
                       "unit_cell_a": self.unit_cell_a,
                       "unit_cell_b": self.unit_cell_b,
                       "unit_cell_c": self.unit_cell_c,
@@ -174,14 +178,19 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
         # hy6zqa\edrf#\QAQ\qa
 
     def get_raddose_binary_path(self):
-        return '/dls_sw/apps/raddose/3D-4.0/raddose3d.jar'
+        install_path = '/dls_sw/apps/raddose/3D-4.0/raddose3d.jar'
+        memory_path = '/run/user/1007182/raddose3d/raddose3d.jar'
+        if os.path.isfile(memory_path):
+            return memory_path
+        else:
+            return install_path
     
     def get_prefix(self):
         return self.prefix
     
     def run(self):
         self.save_input_file()
-        line = "/dls_sw/apps/java/x64/jdk1.8.0_181/bin/java -jar %s -i %s -p %s" % (self.get_raddose_binary_path(), self.get_input_filename(), os.path.join(self.get_output_directory(), '%s%s-' % (self.get_prefix(), self.get_template_name())))
+        line = "/dls_sw/apps/java/x64/jdk1.8.0_181/bin/java -jar  %s -i %s -p %s" % (self.get_raddose_binary_path(), self.get_input_filename(), os.path.join(self.get_output_directory(), '%s%s-' % (self.get_prefix(), self.get_template_name())))
         print('executing: %s' % line)
         subprocess.check_call(line,shell=True)
         #line2 = ''
