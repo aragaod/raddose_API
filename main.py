@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import subprocess, sys, json, uuid,os
 from libs.raddose_wrapper import raddose
 from decimal import Decimal
+from datetime import timedelta
 
 app = FastAPI()
 
@@ -45,7 +46,7 @@ def read_item(
         'elements_protein_concentration':elements_protein_concentration,
         'elements_solvent_concentration':elements_solvent_concentration,
         'solvent_fraction':solvent_fraction,
-        'flux':'%.2e' % Decimal(flux),
+        'flux':'%.1e' % Decimal(flux),
         'beam_size_x':beam_size_x,
         'beam_size_y':beam_size_y,
         'photon_energy':energy_kev,
@@ -72,13 +73,18 @@ def run_raddose3d(**kargs):
     print(f'kargs are: {kargs}')
     new_temp_folder_name = uuid.uuid4().hex
     new_temp_folder = os.path.join(DLS_scratch_folder,new_temp_folder_name)
-
-    try:
-        os.makedirs(new_temp_folder)
-    except Exception as e:
-        print(f'Error creating directory {new_temp_folder}')
-
+    
     rp = raddose(output_directory=new_temp_folder,**kargs)
-    rp.run()
-        
+    if not rp.check_if_already_in_redis():
+        if make_temporary_folder(new_temp_folder):
+            rp.run(redis_timedelta=timedelta(days=15))
     return rp.data
+
+def make_temporary_folder(temp_folder):
+    
+    try:
+        os.makedirs(temp_folder)
+        return temp_folder
+    except Exception as e:
+        print(f'Error creating directory {temp_folder}. Error was {e}')
+        return False

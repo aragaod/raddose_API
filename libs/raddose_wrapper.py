@@ -9,8 +9,10 @@ import time
 import numpy as np
 import shutil
 import csv
-import pickle
+import pickle,json
 from pprint import pprint
+
+from beamline import redis
 
 class raddose:
     template = '''
@@ -78,7 +80,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
 #AngularResolution 3     # Only change from the defaults when using very
                           # small wedges, e.g 5°.
     '''
-    input_filename_template = '{size_x:.1f}_{size_y:.1f}_{size_z:.1f}_{comp_reso:.1f}_{unit_cell_a:.1f}_{unit_cell_b:.1f}_{unit_cell_c:.1f}_{number_of_monomers:d}_{number_of_residues:d}_{elements_protein_concentration:f}_{elements_solvent_concentration:f}_{solvent_fraction:.2f}_{flux:.2s}_{beam_size_x:.1f}_{beam_size_y:.1f}_{photon_energy:.2f}_{oscillation_start:.1f}_{oscillation_end:.1f}_{total_exposure_time:.1f}.txt'
+    input_filename_template = '{size_x:.1f}_{size_y:.1f}_{size_z:.1f}_{comp_reso:.1f}_{unit_cell_a:.1f}_{unit_cell_b:.1f}_{unit_cell_c:.1f}_{number_of_monomers:d}_{number_of_residues:d}_{elements_protein_concentration:f}_{elements_solvent_concentration:f}_{solvent_fraction:.2f}_{flux:s}_{beam_size_x:.1f}_{beam_size_y:.1f}_{photon_energy:.2f}_{oscillation_start:.1f}_{oscillation_end:.1f}_{total_exposure_time:.1f}.txt'
     
     def __init__(self,
                  size_x=30.,
@@ -188,7 +190,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
     def get_prefix(self):
         return self.prefix
     
-    def run(self):
+    def run(self,redis_timedelta=False):
         self.save_input_file()
         line = "/dls_sw/apps/java/x64/jdk1.8.0_181/bin/java -jar  %s -i %s -p %s" % (self.get_raddose_binary_path(), self.get_input_filename(), os.path.join(self.get_output_directory(), '%s%s-' % (self.get_prefix(), self.get_template_name())))
         print('executing: %s' % line)
@@ -200,6 +202,28 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
         #print 'executing: %s' % line2
         #os.system('ssh process1 "%s" ' % line2)
         self.save_summary_pickle()
+        if redis_timedelta:
+            #TODO move redis to API instead of running it in raddose_wrapper
+            try:
+                rediskey = self.get_redis_key()
+                redis.setex(rediskey,redis_timedelta,json.dumps(self.data))
+            except:
+                print('Problem caching the result into redis')
+
+    def check_if_already_in_redis(self):
+        rediskey = self.get_redis_key()
+        try:
+            self.data = json.loads(redis.get(rediskey))
+        except:
+            self.data = False
+        return self.data
+    
+    def get_redis_key(self):
+        redistemplate = self.get_template_name().replace('_',':')
+        rediskey = f'i04:raddose3d:{redistemplate}'
+        return rediskey
+
+        
         
     def get_template_name(self):
         return os.path.basename(self.get_input_filename().replace('.txt', ''))
