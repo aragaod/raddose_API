@@ -30,7 +30,10 @@ class Raddose_API_client(object):
         self.raddose3d_api_server_url = 'i04-ws004.diamond.ac.uk'
         self.raddose3d_api_server_port = 8000
 
-        self.raddose3d_api_url = '/api/v1.0/getdose?flux={flux}&beam_size_x={beamsize_x}&beam_size_y={beamsize_y}&xtal_size_x={xtalsize_x}&xtal_size_y={xtalsize_y}&xtal_size_z={xtalsize_z}&oscillation_start={oscillation_start}&oscillation_end={oscillation_end}&total_exposure_time={total_exposure_time}&energy_kev={energy_kev}'
+        self.raddose3d_api_url_dose = '/api/v1.0/getdose?flux={flux}&beam_size_x={beamsize_x}&beam_size_y={beamsize_y}&xtal_size_x={xtalsize_x}&xtal_size_y={xtalsize_y}&xtal_size_z={xtalsize_z}&oscillation_start={oscillation_start}&oscillation_end={oscillation_end}&total_exposure_time={total_exposure_time}&energy_kev={energy_kev}'
+
+        self.raddose3d_api_url_exposure = '/api/v1.0/getexposure?flux={flux}&beam_size_x={beamsize_x}&beam_size_y={beamsize_y}&xtal_size_x={xtalsize_x}&xtal_size_y={xtalsize_y}&xtal_size_z={xtalsize_z}&oscillation_start={oscillation_start}&oscillation_end={oscillation_end}&total_dose={total_dose}&energy_kev={energy_kev}'
+
 
 
     def setLogLevel(self, level='info'):
@@ -48,16 +51,48 @@ class Raddose_API_client(object):
             else:
                 logging.disable(logging.NOTSET)
                 self.logger.setLevel(levels[level])
-                self.logger.info('Set log level to '+level)
+                self.logger.debug('Set log level to '+level)
         else:
             self.logger.error('Log level should be: '+','.join(levels.keys()))
 
     def get_dose(self,flux,beamsize_x,beamsize_y,xtalsize_x, xtalsize_y,xtalsize_z, oscillation_start, oscillation_end, total_exposure_time,energy_kev):
         input_parameters = {'flux': flux, 'beamsize_x': beamsize_x,'beamsize_y':beamsize_y,'xtalsize_x':xtalsize_x,'xtalsize_y':xtalsize_y,'xtalsize_z':xtalsize_z,'oscillation_start': oscillation_start,'oscillation_end': oscillation_end, 'energy_kev': energy_kev,'total_exposure_time':total_exposure_time}
+
+        return self.query_raddose3d_api(parameters=input_parameters,query_type='getdose')
+
+    def get_dose_with_assumptions(self,total_exposure_time,flux,energy_kev, beamsize_x,beamsize_y,dose_method='Max Dose'):
+        input_parameters = {'total_exposure_time':total_exposure_time,'flux': flux, 'beamsize_x': beamsize_x,'beamsize_y':beamsize_y,'xtalsize_x':beamsize_x,'xtalsize_y':beamsize_y,'xtalsize_z':beamsize_y,'oscillation_start': 0.0,'oscillation_end': 360.0, 'energy_kev': energy_kev}
+
+        result = self.get_dose(**input_parameters)[dose_method]
+
+        self.logger.info('Calculated dose in MGy is:%s' %(result))
+        return result
+
+    def get_exposure(self,flux,beamsize_x,beamsize_y,xtalsize_x, xtalsize_y,xtalsize_z, oscillation_start, oscillation_end, total_dose,energy_kev):
+        input_parameters = {'flux': flux, 'beamsize_x': beamsize_x,'beamsize_y':beamsize_y,'xtalsize_x':xtalsize_x,'xtalsize_y':xtalsize_y,'xtalsize_z':xtalsize_z,'oscillation_start': oscillation_start,'oscillation_end': oscillation_end, 'energy_kev': energy_kev,'total_dose':total_dose}
+
+        return self.query_raddose3d_api(parameters=input_parameters,query_type='getexposure')
+
+    def get_exposure_with_assumptions(self,total_dose,flux,energy_kev, beamsize_x,beamsize_y,dose_method='Max Dose'):
+        input_parameters = {'total_dose':total_dose,'flux': flux, 'beamsize_x': beamsize_x,'beamsize_y':beamsize_y,'xtalsize_x':beamsize_x,'xtalsize_y':beamsize_y,'xtalsize_z':beamsize_y,'oscillation_start': 0.0,'oscillation_end': 360.0, 'energy_kev': energy_kev}
+
+        result = self.get_exposure(**input_parameters)['total_exposure']
+
+        self.logger.info('Proposed exposure in seconds is %s' %(result))
+        return result
+
+    def query_raddose3d_api(self,parameters,query_type):
+
+        query ={'getdose': self.raddose3d_api_url_dose,'getexposure': self.raddose3d_api_url_exposure}
+        
         try:
             self.conn = httplib.HTTPConnection(host=self.raddose3d_api_server_url,port=self.raddose3d_api_server_port)
             self.conn.set_debuglevel(0)
-            self.conn.request('GET', self.raddose3d_api_url.format(**input_parameters))
+
+            self.logger.debug('API URL query is:')
+            self.logger.debug(query[query_type].format(**parameters))
+
+            self.conn.request('GET', query[query_type].format(**parameters))
             self.response = self.conn.getresponse()
             self.data = json.loads(self.response.read())
             self.conn.close()
@@ -73,8 +108,5 @@ class Raddose_API_client(object):
             self.logger.warning('query to raddose API failed with error: %s' %(e))
             return False
 
-    def get_dose_with_assumptions(self,total_exposure_time,flux,energy_kev, beamsize_x,beamsize_y,dose_method='Max Dose'):
-        input_parameters = {'total_exposure_time':total_exposure_time,'flux': flux, 'beamsize_x': beamsize_x,'beamsize_y':beamsize_y,'xtalsize_x':beamsize_x,'xtalsize_y':beamsize_y,'xtalsize_z':beamsize_y,'oscillation_start': 0.0,'oscillation_end': 360.0, 'energy_kev': energy_kev}
-        return self.get_dose(**input_parameters)[dose_method]
 
 #raddose_test = Raddose_API_client()
