@@ -351,6 +351,7 @@ def _lookup_flux(i_read,energy,debug=False):
 
 def calculate_dose_via_raddose3d(total_exposure,flux,energy, beamsize_x=False, beamsize_y=False,dose_method='Max Dose'):
         '''
+        TO MIGRATE TO dose_utils.py soon 21/Apr/2020
         Development in progress by David Aragao 2020 April 11: using Raddose3d via a RESTfull API to calculate dose deposited on a protein crystal
         '''
         try:
@@ -358,10 +359,31 @@ def calculate_dose_via_raddose3d(total_exposure,flux,energy, beamsize_x=False, b
                         beamsize_x, beamsize_y = fswitch_tool.calc_beamsize_from_lenses()
                 import raddose3d_queries
                 raddose_client = raddose3d_queries.Raddose_API_client()
+
                 return raddose_client.get_dose_with_assumptions(total_exposure_time=total_exposure,flux=flux, beamsize_x=beamsize_x, beamsize_y=beamsize_y, energy_kev=energy)
+
         except Exception as e:
                 print('Failed to calculate dose via raddose3d with error %s' %(e))
                 return 0.0
+
+def calculate_exposure_via_raddose3d(total_dose,flux,energy, beamsize_x=False, beamsize_y=False,dose_method='Max Dose'):
+        '''
+        TO MIGRATE TO dose_utils.py soon 21/Apr/2020
+        Development in progress by David Aragao 2020 April 11: using Raddose3d via a RESTfull API to calculate dose deposited on a protein crystal
+        '''
+        try:
+                if beamsize_x == False or beamsize_y == False:
+                        beamsize_x, beamsize_y = fswitch_tool.calc_beamsize_from_lenses()
+                import raddose3d_queries
+                raddose_client = raddose3d_queries.Raddose_API_client()
+
+                return raddose_client.get_exposure_with_assumptions(total_dose=total_dose,flux=flux, beamsize_x=beamsize_x, beamsize_y=beamsize_y, energy_kev=energy)
+
+        except Exception as e:
+                print('Failed to exposure dose via raddose3d with error %s' %(e))
+                return 0.0
+
+
 
 # Alias for convenience
 dose = dose_rate_calculator
