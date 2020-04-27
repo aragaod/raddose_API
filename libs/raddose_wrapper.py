@@ -222,8 +222,6 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
         redistemplate = self.get_template_name().replace('_',':')
         rediskey = f'i04:raddose3d:{redistemplate}'
         return rediskey
-
-        
         
     def get_template_name(self):
         return os.path.basename(self.get_input_filename().replace('.txt', ''))
