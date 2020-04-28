@@ -14,9 +14,9 @@ DLS_scratch_folder = '/run/user/1007182/raddose3d/'
 
 @app.get("/api/v1.0/getdose")
 def read_item(
-        xtal_size_x: float = Query(None, description="Crystal horizontal size (mm)", title="in mm"),
-        xtal_size_y: float = Query(None, description="Crystal vertical size (mm)", title="in mm"),
-        xtal_size_z: float = Query(None, description="Crystal depth size (mm)", title="in mm"),
+        xtal_size_x: float = Query(None, description="Crystal horizontal size (microns)", title="in microns"),
+        xtal_size_y: float = Query(None, description="Crystal vertical size (microns)", title="in microns"),
+        xtal_size_z: float = Query(None, description="Crystal depth size (microns)", title="in microns"),
         comp_reso: float = Query(None, description="The computational resolution needs to be increased from 0.5 for small crystals of 20 cubic microns or less (pixels/micron)", title="pixels per micron"),
         unit_cell_a: float = Query(None, description="Unit cell a dimension (angstroms)", title="Angstroms"),
         unit_cell_b: float = Query(None, description="Unit cell b dimension (angstroms)", title="Angstroms"),
@@ -27,8 +27,8 @@ def read_item(
         elements_solvent_concentration: float =  Query(None, description="Crystallant concentration (M)", title="Molar"),
         solvent_fraction: float = Query(None, description="Solvent content (fractional number)", title="fraction"),
         flux: str = Query(None, description="Scientific notation e.g 3e11 acceptable", title="in ph/s"),
-        beam_size_x: float = Query(None, description="Beam horizontal size (mm)", title="in mm"),
-        beam_size_y: float = Query(None, description="Beam vertical size (mm)", title="in mm"),
+        beam_size_x: float = Query(None, description="Beam horizontal size (microns)", title="in microns"),
+        beam_size_y: float = Query(None, description="Beam vertical size (microns)", title="in microns"),
         energy_kev: float = Query(None, description="X-ray energy (kev)", title="kev"),
         oscillation_start: float = Query(None, description="Starting angle for dataset (degrees)", title="degrees"),
         oscillation_end: float = Query(None, description="End angle for dataset (degrees)", title="degrees"),
@@ -64,9 +64,9 @@ def read_item(
 
 @app.get("/api/v1.0/getexposure")
 def read_item(
-        xtal_size_x: float = Query(None, description="Crystal horizontal size (mm)", title="in mm"),
-        xtal_size_y: float = Query(None, description="Crystal vertical size (mm)", title="in mm"),
-        xtal_size_z: float = Query(None, description="Crystal depth size (mm)", title="in mm"),
+        xtal_size_x: float = Query(None, description="Crystal horizontal size (microns)", title="in microns"),
+        xtal_size_y: float = Query(None, description="Crystal vertical size (microns)", title="in microns"),
+        xtal_size_z: float = Query(None, description="Crystal depth size (microns)", title="in microns"),
         comp_reso: float = Query(None, description="The computational resolution needs to be increased from 0.5 for small crystals of 20 cubic microns or less (pixels/micron)", title="pixels per micron"),
         unit_cell_a: float = Query(None, description="Unit cell a dimension (angstroms)", title="Angstroms"),
         unit_cell_b: float = Query(None, description="Unit cell b dimension (angstroms)", title="Angstroms"),
@@ -77,8 +77,8 @@ def read_item(
         elements_solvent_concentration: float =  Query(None, description="Crystallant concentration (M)", title="Molar"),
         solvent_fraction: float = Query(None, description="Solvent content (fractional number)", title="fraction"),
         flux: str = Query(None, description="Scientific notation e.g 3e11 acceptable", title="in ph/s"),
-        beam_size_x: float = Query(None, description="Beam horizontal size (mm)", title="in mm"),
-        beam_size_y: float = Query(None, description="Beam vertical size (mm)", title="in mm"),
+        beam_size_x: float = Query(None, description="Beam horizontal size (microns)", title="in microns"),
+        beam_size_y: float = Query(None, description="Beam vertical size (microns)", title="in microns"),
         energy_kev: float = Query(None, description="X-ray energy (kev)", title="kev"),
         oscillation_start: float = Query(None, description="Starting angle for dataset (Degrees)", title="degrees"),
         oscillation_end: float = Query(None, description="End angle for dataset (Degrees)", title="degrees"),
