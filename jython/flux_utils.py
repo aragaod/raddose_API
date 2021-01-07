@@ -7,13 +7,14 @@ from gda.util import QuantityFactory
 from org.slf4j import LoggerFactory
 from gda.epics import LazyPVFactory
 from com.google.common.base import Optional
-from javax.measure.unit import SI
-import fswitch as fswitch_tool
+from tec.units.indriya.unit import Units
+
+from dose_utils import DoseUtils
 
 logger = LoggerFactory.getLogger("FluxScannable")
 
-flux_ce_converter = Finder.getInstance().find("flux_ce_converter")
-flux_i0_converter = Finder.getInstance().find("flux_i0_converter")
+flux_ce_converter = Finder.find("flux_ce_converter")
+flux_i0_converter = Finder.find("flux_i0_converter")
 
 dummy = True if isDummyModeEnabled() else False
 if dummy:
@@ -31,15 +32,18 @@ else:
 	eh_shutter_status_pv_name = "BL04I-PS-SHTR-01:STA"
 	eh_shutter_status_pv = LazyPVFactory.newIntegerFromEnumPV(eh_shutter_status_pv_name)
 
-flux = Finder.getInstance().find("flux")
+flux = Finder.find("flux")
+flux_density = Finder.find("flux_density")
+beam_size_x = Finder.find("beamSizeX")
+beam_size_y = Finder.find("beamSizeY")
 
 USE_I0_FROM_LOOKUP_TABLE_IF_REAL_I0_IS_LOW = False
 
 jythonNameMap = beamline_parameters.JythonNameSpaceMapping()
 
-dose_rate = Finder.getInstance().find("dose_rate")
+dose_rate = Finder.find("dose_rate")
 #dose_rate_calculator = jythonNameMap.dose_rate_calculator
-dose_rate_calculator = Finder.getInstance().find("dose_rate_calculator")
+dose_rate_calculator = Finder.find("dose_rate_calculator")
 
 def actual_flux():
 	eh_shutter_state = eh_shutter_status_pv.get()
@@ -91,11 +95,31 @@ def _predicted_i0(energy):
 	energyEV = QuantityFactory.createFromObject(energy, QuantityFactory.createUnitFromString("eV"))
 	flux_i0_converter.reloadConverter()
 	i0_quantity = flux_i0_converter.toTarget(energyEV)
-	i0_in_amps = i0_quantity.doubleValue(SI.AMPERE)
+	i0_in_amps = i0_quantity.doubleValue(Units.AMPERE)
 	i0_in_ua = i0_in_amps * 1e6
 	
 	logger.debug("at %d eV expected i0 is %.10f uA" % (energy, i0_in_ua))
 	return i0_in_ua
+
+def predict_flux_by_beamsize(energy,transmission,Xsize,Ysize):
+        #in the future adjust scale factor based on beamsize
+        scale_factor = 0.372
+        pd = predicted_flux(energy, transmission, scale_factor)
+
+        #To investigate applying a correction factor based on today's beam current energy
+        #current_flux_is = actual_flux()
+        #current_flux_should_be = predict_flux_for_current_settings()
+        #ratio = current_flux_is / current_flux_should_be 
+        ratio = 1
+
+        return pd *ratio
+
+def predict_flux_for_current_settings():
+        
+        energy = actual_energy()
+        transmission = 100
+        scale_factor = 0.372
+        return predicted_flux(energy, transmission, scale_factor)
 
 def predicted_flux_by_aperture(energy, transmission, aperture_label):
 	params = beamline_parameters.Parameters()
@@ -104,25 +128,7 @@ def predicted_flux_by_aperture(energy, transmission, aperture_label):
 	scale_factor = aperture_factor*float(flux_scale_factor)
         pd = predicted_flux(energy, transmission, scale_factor)
 
-        #****START OF SECTION TO REMOVE LATER
-        #Adding fudge factor that will mean the results is not longer a predicted flux but a fix for an error under 
-        #/dls_sw/i04/software/gda_versions/gda_9_14/workspace_git/gda-mx.git/plugins/uk.ac.gda.px/src/gda/px/flux/DoseCalculator.java
-        #where beamsize is being taken from the appertures rather than the lenses. When we edit the java we should fix this
-
-        #****Reminder to remove import fswitch when the line below is removed****
-        Xsize, Ysize = fswitch_tool.calc_beamsize_from_lenses()
-        #print "beamX,beamY"
-        #print  Xsize, Ysize
-
-        #area = PI * X in mm / 2 * Y in mm / 2
-        beamareainsquaremm = float(3.1416*(Xsize/1e3/2)*(Ysize/1e3/2))
-        #print beamareainsquaremm
-
-        fudge_factor = 0.0314 / beamareainsquaremm
-
-        #****END OF SECTION REMOVE LATER but dont forget to remove fudge factor below
-
-	return pd * fudge_factor
+	return pd 
 
 def predicted_flux(energy, transmission, flux_scale_factor, debug=False):
 	# transmission supplied is in range 0..100
@@ -185,9 +191,19 @@ def calculate_current_flux():
 	try:
 		current_flux = actual_flux()
 		flux.moveTo(current_flux)
+		
+		beam_area = math.pi * (beam_size_x.getPosition()/2) * (beam_size_y.getPosition()/2)
+		if beam_area == 0:
+			flux_density.moveTo(0.0)
+		else:
+			flux_density.moveTo(current_flux/beam_area)
+
+                dose_utils.calculate_current_dose_rate() #I04-430
+			
 	except:
 		if not isDummyModeEnabled():
 			flux.moveTo(0.0)
+			flux_density.moveTo(0.0)
 			logger.debug("Unable to calculate flux")
 
 def get_current_flux():
@@ -197,54 +213,13 @@ def get_current_flux():
 		logger.error("Unable to record flux for data collection")
 		return Optional.absent()
 
-def _dose_rate(flux,muAbs,beamWidthInMicrons,beamHeightInMicrons,energyInEv):
-	rate = dose_rate_calculator.calculateDosePerSecond(flux,muAbs,beamWidthInMicrons,beamHeightInMicrons,energyInEv)
-	return rate
-
-def actual_dose_rate():
-	energy = actual_energy()
-	muAbsValue = _muAbs(energy)
-	# get beam size
-	beamSizeXObject = Finder.getInstance().find("beamSizeX")
-	beamSizeYObject = Finder.getInstance().find("beamSizeY")
-	realBeamSizeX = beamSizeXObject.getPosition()
-	realBeamSizeY = beamSizeYObject.getPosition()
-	flux_reading = flux.rawGetPosition()
-	return _dose_rate(flux_reading,muAbsValue,realBeamSizeX,realBeamSizeY,energy)
-			
-def calculate_current_dose_rate():
-	try:
-		current_dose_rate = actual_dose_rate() # rate in MGy/s
-		dose_rate.moveTo(current_dose_rate)
-		return current_dose_rate
-	except:
-		logger.error("Unable to calculate dose rate")
-
 def actual_energy():
 	jythonNameMap = beamline_parameters.JythonNameSpaceMapping()
 	# get current energy
 	bl = jythonNameMap.bl
 	energy = bl()
 	return energy
-
-def _muAbs(energy):
-	logger.debug("current energy is %d eV" % energy)
-	muAbsObject = Finder.getInstance().find("muAbs")
-	if (muAbsObject.isUseDefault()):
-		muAbsValue = dose_rate_calculator.muAbsForAverageSample(energy)
-		muAbsObject.moveTo(muAbsValue)
-	else:
-		muAbsValue = muAbsObject.getPosition()
-	logger.debug("Using muAbs = %g" % muAbsValue)
-	return muAbsValue
 	
-def calculate_current_dose_per_frame(exposure):
-	try:
-		dose_rate = calculate_current_dose_rate()
-		return dose_rate * exposure
-	except:
-		logger.error("Unable to calculate dose per frame")
-
 
 def _get_i_bounds(i_read,e_col,debug=False):
 	i_lower = 0.0
@@ -253,7 +228,7 @@ def _get_i_bounds(i_read,e_col,debug=False):
 	j_key = 0.0
 	try:
 		# The required configured LookupTable (MXGDA-2681)
-		lut = Finder.getInstance().find("flux_xbpm2_calibration")
+		lut = Finder.find("flux_xbpm2_calibration")
 	except:
 		pass # return zeroes
 	
@@ -349,41 +324,9 @@ def _lookup_flux(i_read,energy,debug=False):
 		
 	return flux
 
-def calculate_dose_via_raddose3d(total_exposure,flux,energy, beamsize_x=False, beamsize_y=False,dose_method='Max Dose'):
-        '''
-        TO MIGRATE TO dose_utils.py soon 21/Apr/2020
-        Development in progress by David Aragao 2020 April 11: using Raddose3d via a RESTfull API to calculate dose deposited on a protein crystal
-        '''
-        try:
-                if beamsize_x == False or beamsize_y == False:
-                        beamsize_x, beamsize_y = fswitch_tool.calc_beamsize_from_lenses()
-                import raddose3d_queries
-                raddose_client = raddose3d_queries.Raddose_API_client()
-
-                return raddose_client.get_dose_with_assumptions(total_exposure_time=total_exposure,flux=flux, beamsize_x=beamsize_x, beamsize_y=beamsize_y, energy_kev=energy)
-
-        except Exception as e:
-                print('Failed to calculate dose via raddose3d with error %s' %(e))
-                return 0.0
-
-def calculate_exposure_via_raddose3d(total_dose,flux,energy, beamsize_x=False, beamsize_y=False,dose_method='Max Dose'):
-        '''
-        TO MIGRATE TO dose_utils.py soon 21/Apr/2020
-        Development in progress by David Aragao 2020 April 11: using Raddose3d via a RESTfull API to calculate dose deposited on a protein crystal
-        '''
-        try:
-                if beamsize_x == False or beamsize_y == False:
-                        beamsize_x, beamsize_y = fswitch_tool.calc_beamsize_from_lenses()
-                import raddose3d_queries
-                raddose_client = raddose3d_queries.Raddose_API_client()
-
-                return raddose_client.get_exposure_with_assumptions(total_dose=total_dose,flux=flux, beamsize_x=beamsize_x, beamsize_y=beamsize_y, energy_kev=energy)
-
-        except Exception as e:
-                print('Failed to exposure dose via raddose3d with error %s' %(e))
-                return 0.0
 
 
 
 # Alias for convenience
 dose = dose_rate_calculator
+dose_utils = DoseUtils()
