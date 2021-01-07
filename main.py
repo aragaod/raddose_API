@@ -7,7 +7,7 @@ from datetime import timedelta
 app = FastAPI()
 
 # DLS_scratch_folder = '/scratch/raddose3d/'
-DLS_scratch_folder = "/run/user/1007182/raddose3d/"
+DLS_scratch_folder = "/run/user/1007182/raddose3d/cache/"
 
 # methods = {"getdose": "-get_dose", "getexposure": "-getexposure"}
 
@@ -311,4 +311,6 @@ def loop_raddose_until_target_dose(
             break
 
     new_result["total_exposure"] = new_exposure
+    new_result["input_parameters"]["requested_dose"] = total_dose
+    new_result["input_parameters"]["dose_method"] = dose_method
     return new_result
