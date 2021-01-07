@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function 
+from __future__ import print_function
 
 import os
 import subprocess
@@ -9,13 +9,15 @@ import time
 import numpy as np
 import shutil
 import csv
-import pickle,json
+import pickle, json
 from pprint import pprint
+from time import time
 
 from beamline import redis
 
+
 class raddose:
-    template = '''
+    template = """
 ##############################################################################
 #                                 Crystal Block                              #
 ##############################################################################
@@ -79,34 +81,35 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
 
 #AngularResolution 3     # Only change from the defaults when using very
                           # small wedges, e.g 5°.
-    '''
-    input_filename_template = '{size_x:.1f}_{size_y:.1f}_{size_z:.1f}_{comp_reso:.1f}_{unit_cell_a:.1f}_{unit_cell_b:.1f}_{unit_cell_c:.1f}_{number_of_monomers:d}_{number_of_residues:d}_{elements_protein_concentration:f}_{elements_solvent_concentration:f}_{solvent_fraction:.2f}_{flux:s}_{beam_size_x:.1f}_{beam_size_y:.1f}_{photon_energy:.2f}_{oscillation_start:.1f}_{oscillation_end:.1f}_{total_exposure_time:.1f}.txt'
-    
-    def __init__(self,
-                 size_x=30.,
-                 size_y=30.,
-                 size_z=30.,
-                 comp_reso=0.5,
-                 unit_cell_a=78.,
-                 unit_cell_b=78.,
-                 unit_cell_c=36.,
-                 number_of_monomers=1,
-                 number_of_residues=200,
-                 elements_protein_concentration=0.0,
-                 elements_solvent_concentration=0.0,
-                 solvent_fraction=0.5,
-                 flux=1.6e12,
-                 beam_size_x=10.,
-                 beam_size_y=5.,
-                 photon_energy=12.65,
-                 oscillation_start=0.,
-                 oscillation_end=360.,
-                 total_exposure_time=90.,
-                 prefix='output-',
-                 output_directory='/scratch/raddose3d/',
-                 verbose=False,):
+    """
+    input_filename_template = "{size_x:.1f}_{size_y:.1f}_{size_z:.1f}_{comp_reso:.1f}_{unit_cell_a:.1f}_{unit_cell_b:.1f}_{unit_cell_c:.1f}_{number_of_monomers:d}_{number_of_residues:d}_{elements_protein_concentration:f}_{elements_solvent_concentration:f}_{solvent_fraction:.2f}_{flux:s}_{beam_size_x:.1f}_{beam_size_y:.1f}_{photon_energy:.2f}_{oscillation_start:.1f}_{oscillation_end:.1f}_{total_exposure_time:.1f}.txt"
 
-        
+    def __init__(
+        self,
+        size_x=30.0,
+        size_y=30.0,
+        size_z=30.0,
+        comp_reso=0.5,
+        unit_cell_a=78.0,
+        unit_cell_b=78.0,
+        unit_cell_c=36.0,
+        number_of_monomers=1,
+        number_of_residues=200,
+        elements_protein_concentration=0.0,
+        elements_solvent_concentration=0.0,
+        solvent_fraction=0.5,
+        flux=1.6e12,
+        beam_size_x=10.0,
+        beam_size_y=5.0,
+        photon_energy=12.65,
+        oscillation_start=0.0,
+        oscillation_end=360.0,
+        total_exposure_time=90.0,
+        prefix="output-",
+        output_directory="/scratch/raddose3d/",
+        verbose=False,
+    ):
+
         self.size_x = size_x
         self.size_y = size_y
         self.size_z = size_z
@@ -129,43 +132,48 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
         self.output_directory = output_directory
         self.prefix = prefix
         self.verbose = verbose
-        self.expected_files = ['%sSummary.csv' % self.prefix,
-                               '%sSummary.txt' % self.prefix,
-                               '%sDoseState.csv' % self.prefix,
-                               '%sDoseState.R' % self.prefix,
-                               '%sRDE.csv' % self.prefix]
-        
+        self.expected_files = [
+            "%sSummary.csv" % self.prefix,
+            "%sSummary.txt" % self.prefix,
+            "%sDoseState.csv" % self.prefix,
+            "%sDoseState.R" % self.prefix,
+            "%sRDE.csv" % self.prefix,
+        ]
+
     def get_parameters(self):
-        parameters = { 
-                      "size_x": self.size_x,
-                      "size_y": self.size_y,
-                      "size_z": self.size_z,
-                      "comp_reso": self.comp_reso,
-                      "unit_cell_a": self.unit_cell_a,
-                      "unit_cell_b": self.unit_cell_b,
-                      "unit_cell_c": self.unit_cell_c,
-                      "number_of_monomers": self.number_of_monomers,
-                      "number_of_residues": self.number_of_residues,
-                      "elements_protein_concentration": self.elements_protein_concentration,
-                      "elements_solvent_concentration": self.elements_solvent_concentration,
-                      "solvent_fraction": self.solvent_fraction,
-                      "flux": self.flux,
-                      "beam_size_x": self.beam_size_x,
-                      "beam_size_y": self.beam_size_y,
-                      "photon_energy": self.photon_energy,
-                      "oscillation_start": self.oscillation_start,
-                      "oscillation_end": self.oscillation_end,
-                      "total_exposure_time": self.total_exposure_time
-                      }
+        parameters = {
+            "size_x": self.size_x,
+            "size_y": self.size_y,
+            "size_z": self.size_z,
+            "comp_reso": self.comp_reso,
+            "unit_cell_a": self.unit_cell_a,
+            "unit_cell_b": self.unit_cell_b,
+            "unit_cell_c": self.unit_cell_c,
+            "number_of_monomers": self.number_of_monomers,
+            "number_of_residues": self.number_of_residues,
+            "elements_protein_concentration": self.elements_protein_concentration,
+            "elements_solvent_concentration": self.elements_solvent_concentration,
+            "solvent_fraction": self.solvent_fraction,
+            "flux": self.flux,
+            "beam_size_x": self.beam_size_x,
+            "beam_size_y": self.beam_size_y,
+            "photon_energy": self.photon_energy,
+            "oscillation_start": self.oscillation_start,
+            "oscillation_end": self.oscillation_end,
+            "total_exposure_time": self.total_exposure_time,
+        }
         return parameters
-    
+
     def get_input_filename(self):
-        input_filename = os.path.join(self.output_directory, self.input_filename_template.format(**self.get_parameters()))
+        input_filename = os.path.join(
+            self.output_directory,
+            self.input_filename_template.format(**self.get_parameters()),
+        )
         return input_filename
-    
+
     def get_output_directory(self):
         return self.output_directory
-    
+
     def save_input_file(self):
         input_filename = self.get_input_filename()
         if os.path.isfile(input_filename):
@@ -173,64 +181,92 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
         if not os.path.isdir(os.path.dirname(input_filename)):
             os.makedirs(os.path.dirname(input_filename))
         text = self.template.format(**self.get_parameters())
-        f = open(self.get_input_filename(), 'w')
+        f = open(self.get_input_filename(), "w")
         f.write(text)
         f.close()
         os.chmod(self.get_input_filename(), 0o777)
         # hy6zqa\edrf#\QAQ\qa
 
     def get_raddose_binary_path(self):
-        install_path = '/dls_sw/apps/raddose/3D-4.0/raddose3d.jar'
-        memory_path = '/run/user/1007182/raddose3d/raddose3d.jar'
+        install_path = "/dls_sw/apps/raddose/3D-4.0/raddose3d.jar"
+        memory_path = "/run/user/1007182/raddose3d/raddose3d.jar"
         if os.path.isfile(memory_path):
             return memory_path
         else:
             return install_path
-    
+
     def get_prefix(self):
         return self.prefix
-    
-    def run(self,redis_timedelta=False):
+
+    def run(self, redis_timedelta=False):
         self.save_input_file()
-        line = "/dls_sw/apps/java/x64/jdk1.8.0_181/bin/java -jar  %s -i %s -p %s" % (self.get_raddose_binary_path(), self.get_input_filename(), os.path.join(self.get_output_directory(), '%s%s-' % (self.get_prefix(), self.get_template_name())))
-        print('executing: %s' % line)
-        subprocess.check_call(line,shell=True)
-        #line2 = ''
-        #for f in self.expected_files:
-            #new_name = f.replace('output-', 'output-%s-' % self.get_template_name())
-            #line2 += 'mv %s %s;' % (os.path.join(os.getenv('HOME'), f), os.path.join(self.output_directory, new_name))
-        #print 'executing: %s' % line2
-        #os.system('ssh process1 "%s" ' % line2)
+        line = "/dls_sw/apps/java/x64/jdk1.8.0_181/bin/java -jar  %s -i %s -p %s" % (
+            self.get_raddose_binary_path(),
+            self.get_input_filename(),
+            os.path.join(
+                self.get_output_directory(),
+                "%s%s-" % (self.get_prefix(), self.get_template_name()),
+            ),
+        )
+        print("executing: %s" % line)
+        subprocess.check_call(line, shell=True)
+        # line2 = ''
+        # for f in self.expected_files:
+        # new_name = f.replace('output-', 'output-%s-' % self.get_template_name())
+        # line2 += 'mv %s %s;' % (os.path.join(os.getenv('HOME'), f), os.path.join(self.output_directory, new_name))
+        # print 'executing: %s' % line2
+        # os.system('ssh process1 "%s" ' % line2)
         self.save_summary_pickle()
+
+        self.data["input_parameters"] = self.get_parameters()
+
         if redis_timedelta:
-            #TODO move redis to API instead of running it in raddose_wrapper
+            # TODO move redis to API instead of running it in raddose_wrapper
             try:
                 rediskey = self.get_redis_key()
-                redis.setex(rediskey,redis_timedelta,json.dumps(self.data))
-            except:
-                print('Problem caching the result into redis')
+                self.data["cache"] = {
+                    "run": int(time()),
+                    "max ttl": redis_timedelta.total_seconds(),
+                }
+                redis.setex(rediskey, redis_timedelta, json.dumps(self.data))
+                self.data["cache"] = {"read_cache": False}
+            except Exception as e:
+                print(f"Problem caching the result into redis, error {e}")
 
     def check_if_already_in_redis(self):
         rediskey = self.get_redis_key()
         try:
             self.data = json.loads(redis.get(rediskey))
+            ttl = redis.ttl(rediskey)
+            if self.data.get("cache"):
+                self.data["cache"]["expires"] = ttl
+                self.data["cache"]["read_cache"] = True
+            else:
+                self.data = {
+                    "run": time.time() - (21600 - ttl),
+                    "max_ttl": 21600,
+                    "expires": ttl,
+                    "read_cache": True,
+                }
         except:
             self.data = False
         return self.data
-    
+
     def get_redis_key(self):
-        redistemplate = self.get_template_name().replace('_',':')
-        rediskey = f'i04:raddose3d:{redistemplate}'
+        redistemplate = self.get_template_name().replace("_", ":")
+        rediskey = f"i04:raddose3d:{redistemplate}"
         return rediskey
-        
+
     def get_template_name(self):
-        return os.path.basename(self.get_input_filename().replace('.txt', ''))
-                                
+        return os.path.basename(self.get_input_filename().replace(".txt", ""))
+
     def get_summary_pickle_name(self):
-        return os.path.join(self.output_directory, '%s.pickle' % self.get_template_name())
-    
+        return os.path.join(
+            self.output_directory, "%s.pickle" % self.get_template_name()
+        )
+
     def save_summary_pickle(self):
-        summary_filename = 'output-%s-Summary.csv' % self.get_template_name()
+        summary_filename = "output-%s-Summary.csv" % self.get_template_name()
         filename = os.path.join(self.output_directory, summary_filename)
         f = open(filename)
         a = csv.reader(f)
@@ -242,12 +278,12 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
         if self.verbose:
             print("Data is")
             pprint(self.data)
-        print("Goint to write to %s" %(self.get_summary_pickle_name()))
-        summary_pickle_file = open(self.get_summary_pickle_name(), 'wb')
+        print("Goint to write to %s" % (self.get_summary_pickle_name()))
+        summary_pickle_file = open(self.get_summary_pickle_name(), "wb")
         pickle.dump(self.data, summary_pickle_file)
         summary_pickle_file.close()
         os.chmod(self.get_summary_pickle_name(), 0o777)
- 
+
     def get_summary_pickle(self):
         if os.path.isfile(self.get_summary_pickle_name()):
             summary_pickle = pickle.load(open(self.get_summary_pickle_name()))
@@ -255,41 +291,98 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
             self.run()
             summary_pickle = pickle.load(open(self.get_summary_pickle_name()))
         return summary_pickle
-    
+
     def get_DWD(self):
-        return self.get_summary_pickle()['DWD']
-        
-        
-        
-if __name__ == '__main__':
+        return self.get_summary_pickle()["DWD"]
+
+
+if __name__ == "__main__":
     import optparse
-    
+
     parser = optparse.OptionParser()
-    parser.add_option('-x', '--size_x', default=50., type=float, help='horizontal size of crystal')
-    parser.add_option('-y', '--size_y', default=50., type=float, help='vertical size of crystal')
-    parser.add_option('-z', '--size_z', default=50., type=float, help='depth of crystal')
-    parser.add_option('-a', '--unit_cell_a', default=78., type=float, help='unit cell a parameter')
-    parser.add_option('-b', '--unit_cell_b', default=78., type=float, help='unit cell b parameter')
-    parser.add_option('-c', '--unit_cell_c', default=36., type=float, help='unit cell c parameter')
-    parser.add_option('-m', '--number_of_monomers', default=1, type=int, help='number of monomers')
-    parser.add_option('-r', '--number_of_residues', default=200, type=int, help='number of residues')
-    parser.add_option('-p', '--elements_protein_concentration', default='', type=str, help='heavy elements protein concentration')
-    parser.add_option('-w', '--elements_solvent_concentration', default='', type=str, help='heavy elements solvent concentration')
-    parser.add_option('-f', '--solvent_fraction', default=0.5, type=float, help='solvent fraction')
-    parser.add_option('-F', '--flux', default=1.6e12, type=float, help='flux')
-    parser.add_option('-X', '--beam_size_x', default=10., type=float, help='horizontal beam size')
-    parser.add_option('-Y', '--beam_size_y', default=5., type=float, help='vertical beam size')
-    parser.add_option('-P', '--photon_energy', default=12.65, type=float, help='photon energy in keV')
-    parser.add_option('-s', '--oscillation_start', default=0., type=float, help='oscillation start')
-    parser.add_option('-e', '--oscillation_end', default=360., type=float, help='oscillation end')
-    parser.add_option('-T', '--total_exposure_time', default=90., type=float, help='total exposure time')
-    parser.add_option('-D', '--output_directory', default='/scratch/raddose3d', type=str, help='output directory')
-    parser.add_option('-n', '--prefix', default='output-', type=str, help='output prefix')
-    parser.add_option('-v', '--verbose', default=False, action='store_true', help='Print output dictionary')
-    
+    parser.add_option(
+        "-x", "--size_x", default=50.0, type=float, help="horizontal size of crystal"
+    )
+    parser.add_option(
+        "-y", "--size_y", default=50.0, type=float, help="vertical size of crystal"
+    )
+    parser.add_option(
+        "-z", "--size_z", default=50.0, type=float, help="depth of crystal"
+    )
+    parser.add_option(
+        "-a", "--unit_cell_a", default=78.0, type=float, help="unit cell a parameter"
+    )
+    parser.add_option(
+        "-b", "--unit_cell_b", default=78.0, type=float, help="unit cell b parameter"
+    )
+    parser.add_option(
+        "-c", "--unit_cell_c", default=36.0, type=float, help="unit cell c parameter"
+    )
+    parser.add_option(
+        "-m", "--number_of_monomers", default=1, type=int, help="number of monomers"
+    )
+    parser.add_option(
+        "-r", "--number_of_residues", default=200, type=int, help="number of residues"
+    )
+    parser.add_option(
+        "-p",
+        "--elements_protein_concentration",
+        default="",
+        type=str,
+        help="heavy elements protein concentration",
+    )
+    parser.add_option(
+        "-w",
+        "--elements_solvent_concentration",
+        default="",
+        type=str,
+        help="heavy elements solvent concentration",
+    )
+    parser.add_option(
+        "-f", "--solvent_fraction", default=0.5, type=float, help="solvent fraction"
+    )
+    parser.add_option("-F", "--flux", default=1.6e12, type=float, help="flux")
+    parser.add_option(
+        "-X", "--beam_size_x", default=10.0, type=float, help="horizontal beam size"
+    )
+    parser.add_option(
+        "-Y", "--beam_size_y", default=5.0, type=float, help="vertical beam size"
+    )
+    parser.add_option(
+        "-P", "--photon_energy", default=12.65, type=float, help="photon energy in keV"
+    )
+    parser.add_option(
+        "-s", "--oscillation_start", default=0.0, type=float, help="oscillation start"
+    )
+    parser.add_option(
+        "-e", "--oscillation_end", default=360.0, type=float, help="oscillation end"
+    )
+    parser.add_option(
+        "-T",
+        "--total_exposure_time",
+        default=90.0,
+        type=float,
+        help="total exposure time",
+    )
+    parser.add_option(
+        "-D",
+        "--output_directory",
+        default="/scratch/raddose3d",
+        type=str,
+        help="output directory",
+    )
+    parser.add_option(
+        "-n", "--prefix", default="output-", type=str, help="output prefix"
+    )
+    parser.add_option(
+        "-v",
+        "--verbose",
+        default=False,
+        action="store_true",
+        help="Print output dictionary",
+    )
+
     options, args = parser.parse_args()
-    
+
     rp = raddose(**vars(options))
     rp.run()
-    
-        
