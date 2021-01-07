@@ -217,6 +217,9 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
         # print 'executing: %s' % line2
         # os.system('ssh process1 "%s" ' % line2)
         self.save_summary_pickle()
+
+        self.data["input_parameters"] = self.get_parameters()
+
         if redis_timedelta:
             # TODO move redis to API instead of running it in raddose_wrapper
             try:
@@ -226,7 +229,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
                     "max ttl": redis_timedelta.total_seconds(),
                 }
                 redis.setex(rediskey, redis_timedelta, json.dumps(self.data))
-                self.data["cache"] = {"read cache": False}
+                self.data["cache"] = {"read_cache": False}
             except Exception as e:
                 print(f"Problem caching the result into redis, error {e}")
 
@@ -237,13 +240,13 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
             ttl = redis.ttl(rediskey)
             if self.data.get("cache"):
                 self.data["cache"]["expires"] = ttl
-                self.data["cache"]["read cache"] = True
+                self.data["cache"]["read_cache"] = True
             else:
                 self.data = {
                     "run": time.time() - (21600 - ttl),
-                    "max ttl": 21600,
+                    "max_ttl": 21600,
                     "expires": ttl,
-                    "read cache": True,
+                    "read_cache": True,
                 }
         except:
             self.data = False
