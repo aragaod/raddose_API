@@ -11,6 +11,7 @@ import shutil
 import csv
 import pickle, json
 from pprint import pprint
+from time import time
 
 from beamline import redis
 
@@ -220,16 +221,30 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
             # TODO move redis to API instead of running it in raddose_wrapper
             try:
                 rediskey = self.get_redis_key()
-                self.data["cache"] = {"run": int(time()), "max ttl": redis_timedelta}
+                self.data["cache"] = {
+                    "run": int(time()),
+                    "max ttl": redis_timedelta.total_seconds(),
+                }
                 redis.setex(rediskey, redis_timedelta, json.dumps(self.data))
-            except:
-                print("Problem caching the result into redis")
+                self.data["cache"] = {"read cache": False}
+            except Exception as e:
+                print(f"Problem caching the result into redis, error {e}")
 
     def check_if_already_in_redis(self):
         rediskey = self.get_redis_key()
         try:
             self.data = json.loads(redis.get(rediskey))
-            self.data_ttl = redis.ttl(rediskey)
+            ttl = redis.ttl(rediskey)
+            if self.data.get("cache"):
+                self.data["cache"]["expires"] = ttl
+                self.data["cache"]["read cache"] = True
+            else:
+                self.data = {
+                    "run": time.time() - (21600 - ttl),
+                    "max ttl": 21600,
+                    "expires": ttl,
+                    "read cache": True,
+                }
         except:
             self.data = False
         return self.data
