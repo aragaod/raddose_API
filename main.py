@@ -194,62 +194,6 @@ def read_item(
     return result
 
 
-@app.get("/api/v1.0/fswitch/getlenses")
-def read_item(
-    R: float = Query(200, description="Radius (microns)", title="in microns"),
-    delta: float = Query(
-        None, description="delta (1-n refraction index)", title="delta"
-    ),
-    n: float = Query(
-        None,
-        description="refraction index (only necessary if delta not provided",
-        title="refraction index",
-    ),
-    f: float = Query(None, description="Focal length", title="focal length"),
-    L: float = Query(
-        None, description="Length of the lenses array (microns)", title="in microns"
-    ),
-):
-
-    if not delta:
-        delta = 1 - n
-
-    return R / (2 * delta * (f - L / delta))
-
-
-@app.get("/api/v1.0/fswitch/getdepthfocus")
-def read_item(
-    S: float = Query(
-        None, description="Beam size at sample position", title="beam size at sample"
-    ),
-    Sm: float = Query(
-        None, description="Beam size at focal point", title="beam size at focal point"
-    ),
-    alpha: float = Query(
-        None,
-        description="Divergence of the beam refracted by the lenses (not required if q provided)",
-        title="Divergence",
-    ),
-    q: float = Query(
-        None,
-        description="Distance from centre lense to Sm (not required unless alpha not provided)",
-        title="Centre lense",
-    ),
-    A: float = Query(
-        600,
-        description="Lens aperture (microns, only used if alpha not provided)",
-        title="Lens aperture",
-    ),
-):
-
-    if not alpha:
-        alpha = A / q
-
-    import math
-
-    return 1 / (alpha * math.sqrt(S ** 2 - Sm ** 2))
-
-
 def run_raddose3d(**kargs):
     print(f"kargs are: {kargs}")
     new_temp_folder_name = uuid.uuid4().hex
