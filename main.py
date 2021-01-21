@@ -4,7 +4,46 @@ from libs.raddose_wrapper import raddose
 from decimal import Decimal
 from datetime import timedelta
 
-app = FastAPI()
+
+tags_metadata = [
+    {
+        "name": "getdose",
+        "description": """Calculate dose given a series of parameters
+
+        The most important are: 
+        Energy
+        Beam size
+        Flux
+        Crystal size (Assumed the same as the beam if not given)
+         
+         
+        """,
+    },
+    {
+        "name": "getexposure",
+        "description": """Calculate exposure given a series of parameters. 
+    
+    IMPORTANT: One needs to choose which dose method does the dose refere to
+
+    Raddose is not designed to do this calculation so we run with a hardcoded dose 
+    and then scale the result to the requested dose, finally run again with the scaled 
+    exposure to test.
+
+        """,
+        "externalDocs": {
+            "description": "Python code in gitlab repo",
+            "url": "https://gitlab.diamond.ac.uk/mx/microdose",
+        },
+    },
+]
+
+
+app = FastAPI(
+    title="RestFUL API for raddose3d",
+    description="With this HTTP API one can run raddose3d to calculate dose from a series of parameters or obtain how many seconds exposure for a particular dose demand",
+    version="1.0.0",
+    openapi_tags=tags_metadata,
+)
 
 # DLS_scratch_folder = '/scratch/raddose3d/'
 DLS_scratch_folder = "/run/user/1007182/raddose3d/cache/"
@@ -12,7 +51,7 @@ DLS_scratch_folder = "/run/user/1007182/raddose3d/cache/"
 # methods = {"getdose": "-get_dose", "getexposure": "-getexposure"}
 
 
-@app.get("/api/v1.0/getdose")
+@app.get("/api/v1.0/getdose", tags=["getdose"])
 def read_item(
     xtal_size_x: float = Query(
         None, description="Crystal horizontal size (microns)", title="in microns"
@@ -100,7 +139,7 @@ def read_item(
     return result
 
 
-@app.get("/api/v1.0/getexposure")
+@app.get("/api/v1.0/getexposure", tags=["getexposure"])
 def read_item(
     xtal_size_x: float = Query(
         None, description="Crystal horizontal size (microns)", title="in microns"
