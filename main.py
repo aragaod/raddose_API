@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Query
 import subprocess, sys, json, uuid, os
 from libs.raddose_wrapper import raddose
+from libs.lookuptables import flux_bs_lookup
 from decimal import Decimal
 from datetime import timedelta
 
@@ -29,6 +30,16 @@ tags_metadata = [
     and then scale the result to the requested dose, finally run again with the scaled 
     exposure to test.
 
+        """,
+        "externalDocs": {
+            "description": "Python code in gitlab repo",
+            "url": "https://gitlab.diamond.ac.uk/mx/microdose",
+        },
+    },
+    {
+        "name": "getflux",
+        "description": """Estimate flux based on energy and beamsize input. 
+    
         """,
         "externalDocs": {
             "description": "Python code in gitlab repo",
@@ -231,6 +242,34 @@ def read_item(
     result = loop_raddose_until_target_dose(total_dose, dose_method, **filtered_nones)
 
     return result
+
+
+@app.get("/api/v1.0/getflux", tags=["getflux"])
+def read_item(
+    energy: float = Query(None, description="Energy (eV)", title="in eVs"),
+    vsize_sp: int = Query(
+        None, description="Vertical beamsize set point (microns)", title="in microns"
+    ),
+):
+
+    lookup = flux_bs_lookup(
+        ["i04:energy_flux:lookup:20210414", "i04:energy_flux:lookup:20210414b"]
+    )
+    print("Re-calculated polinomial fits")
+    flux = lookup.calculate_flux(energy, vsize_sp)
+    n_lenses = lookup.calc_filters(vsize_sp, energy)
+    real_bs = lookup.calc_beamsize_from_lenses(n_lenses, energy)
+    return {
+        "flux": flux,
+        "flux_sn": "{:.5E}".format(flux),
+        "real_h_size": real_bs[0],
+        "real_v_size": real_bs[1],
+        "extra": {
+            "n_lenses": n_lenses,
+            "input_energy": energy,
+            "input_v_size": vsize_sp,
+        },
+    }
 
 
 def run_raddose3d(**kargs):
