@@ -2,6 +2,11 @@ echo "#########"
 /usr/bin/date
 /usr/bin/hostname
 echo "+++++++++"
+if  [ ! -d  /run/user/1007182/raddose3d/cache/ ];then
+    echo "FOlder did not exist. Creating"
+    mkdir -p /run/user/1007182/raddose3d/cache/
+fi
+
 /usr/bin/du -hsc /run/user/1007182/raddose3d/cache
 free_space=$(/usr/bin/df -k /run/user/1007182/raddose3d/cache/ --output=pcent|tail -1|cut -d"%" -f1)
 echo "Free space: $free_space %"
