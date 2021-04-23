@@ -2,6 +2,7 @@ from beamline import redis
 import json
 import numpy
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 class flux_bs_lookup(object):
@@ -102,7 +103,7 @@ class flux_bs_lookup(object):
             return self.models[key](energy)
         else:
             print("Data for that beamsize is unavailable")
-            return False
+            return "Data for that beam size is unavailable"
 
     def calc_filters(self, vertical, energy_eV):
         """f =(k*E^2)/N, N=(k*E^2)/f, k=55/(f+200) where f is vertical beam dimension"""
@@ -125,3 +126,22 @@ class flux_bs_lookup(object):
         # TODO horizontal:vertical ratio energy dependent?
         ratio = 3.285 * (vertical ** -0.243)
         return ratio * vertical
+
+    def return_plot_and_fit(self, vertical_beamsize):
+        # use this https://stackoverflow.com/questions/55873174/how-do-i-return-an-image-in-fastapi
+        # use this http://i04-ws004.diamond.ac.uk:8888/notebooks/Flux_Energy_lookuptables.ipynb
+
+        key = str(vertical_beamsize)
+
+        if key in self.models.keys():
+            range_to_plot = numpy.linspace(6000, 18000, 1000)
+
+            plt.scatter(
+                self.slices_dfs[key].energy, self.slices_dfs[key].normalised_flux
+            )
+            figure = plt.plot(range_to_plot, self.models[key](myline))
+
+            return figure
+        else:
+            print("Data for that beamsize is unavailable")
+            return "Data for that beam size is unavailable"

@@ -1,0 +1,718 @@
+
+
+
+#
+#
+BeamLine BL04I
+
+## BLSE=FB switches between scan alignment and feedback alignment
+## by creating bl energy scannable with beamLineSpecificEnergy_FB
+## after changing you must restart servers or >>> reset_namespace
+BLSE=FB
+
+## BPFB (Beam Position FeedBack)
+## HALF (default) only off during data collection
+## FULL only off for XBPM2 during attenuation optimisation, fluo when trans < 2% and wedged MAD
+## UNAVAILABLE (not default) prevents /dls_sw/i04/software/gda/mx-config/scripts/xbpm_feedback.py trying to access EPICS IOC that may not be running
+BPFB=FULL
+## Note: only beamline scientists control whether feedback is enabled
+## via the I04 XBPM feedback EDM screen in Synoptic
+
+DCM_Perp_Offset_FIXED = 25.75
+
+#
+# beamstop
+#
+parked_x = 4.48
+parked_y =-49.1
+parked_z = -49.3
+parked_z_robot = 49.15 #55, 17/11/2020 value changed see Jira I04-421
+
+#in_beam_x = 0.
+#in_beam_y = 48.
+#in_beam_z = 49
+
+in_beam_z_MIN_START_POS = 49.5 #40.0
+
+in_beam_x_STANDARD = -2.5 
+#in_beam_y_STANDARD = 35.0 #45.91 #46.45
+in_beam_y_STANDARD = 45.65 #45.62 #45.52 #45.46 (16/02)  #45.3 (14/12) 
+in_beam_z_STANDARD = 25.0
+
+
+in_beam_x_HIGHRES = -2.5 #-3.84
+#in_beam_y_HIGHRES = 48.42 # 45.92
+in_beam_y_HIGHRES = 45.65 #45.62 #45.52 #45.52 #45.46 (16/02)
+#in_beam_z_HIGHRES = 12
+# this is used for fluo spectra; original distance 0f 12.0 gives W contamination
+in_beam_z_HIGHRES = 25.0
+
+in_beam_x_LOWRES = -2.50 # -3.84
+#in_beam_y_LOWRES = 48.35 # 45.86
+in_beam_y_LOWRES = 45.63 #45.64 #45.58 #45.48 #45.46 #45.42 #45.23 #45.2 #45.23  #45.2 (16/02)
+in_beam_z_LOWRES = 49.50
+
+
+## in_beam_col_tilt =  -120.0 ## what is this????
+
+checkCryoy=Yes
+#If is to be moved in by the script. If not Yes then control is handed to the robot on activate script
+#To force the cryojet run hutch_utilities.hutch.forceCryoOut()
+manualCryojet=Yes
+
+###############################################################################
+#                                                                             #
+#  2015-07-03 - values to use during miniAPY failure                          #
+#               with no scatterguard or aperture during this period           #
+#                                                                             #
+###############################################################################
+#Aperture - Scatterguard positions new block with 200, 20 and 10 micron ap's
+#200 micron ap
+#miniap_x_LARGE_APERTURE=-4.0
+#miniap_y_LARGE_APERTURE=-48.95
+#miniap_z_LARGE_APERTURE=-12.0
+#sg_x_LARGE_APERTURE=-3.0
+#sg_y_LARGE_APERTURE=-4.4
+
+
+# 20 micron ap - new block with 200, 20 and 10 micron ap's - 
+#miniap_x_MEDIUM_APERTURE=-4.0
+#miniap_y_MEDIUM_APERTURE=-48.95
+#miniap_z_MEDIUM_APERTURE=-12.0
+#sg_x_MEDIUM_APERTURE=-3.0
+#sg_y_MEDIUM_APERTURE=-4.4
+
+# 10 micron ap - new block with 200, 20 and 10 micron ap's - REALLY 20 um as miniap_y cannot reach its position for 10 um 
+#miniap_x_SMALL_APERTURE=-4.0
+#miniap_y_SMALL_APERTURE=-48.95
+#miniap_z_SMALL_APERTURE=-12.0
+#sg_x_SMALL_APERTURE=-3.0
+#sg_y_SMALL_APERTURE=-4.4
+
+# Robot load
+#miniap_x_ROBOT_LOAD=-4.0 
+#miniap_y_ROBOT_LOAD=-48.95
+#miniap_z_ROBOT_LOAD=-12.0
+#sg_x_ROBOT_LOAD=-3.0 
+#sg_y_ROBOT_LOAD=-4.4
+
+# manual mount
+#miniap_x_MANUAL_LOAD=-4.0
+#miniap_y_MANUAL_LOAD=-48.95
+#miniap_z_MANUAL_LOAD=-12.0
+#sg_x_MANUAL_LOAD=-3.0 
+#sg_y_MANUAL_LOAD=-4.4
+
+
+
+
+###############################################################################
+#  2015-01-19 - 200,20, 10  CRLS - set so to use 200 micron all the time      #
+#                                                                             #
+#  2015-07-03 - commented out until miniapY is fixed - values above to work   #
+#               with no scatterguard or aperture during this period           #
+#                                                                             #
+###############################################################################
+#Aperture - Scatterguard positions new block with 200, 20 and 10 micron ap's
+#200 micron ap updated 2015-09-09
+miniap_x_LARGE_APERTURE= 4.34 #3.65 # 4.29 #4.500 #4.6843 #4.717 #4.7
+miniap_y_LARGE_APERTURE= 41.8184 #41.25 #41.5384 #41.801 #42.155 #40.7385
+miniap_z_LARGE_APERTURE=16.9
+sg_x_LARGE_APERTURE=4.800 #4.8 #4.4782 #4.85 #3.9
+sg_y_LARGE_APERTURE=4.682 #4.137 #3.6589 #3.68 #3.4
+
+
+# 20 micron ap - new block with 200, 20 and 10 micron ap's - 
+miniap_x_MEDIUM_APERTURE=4.303 #4.65 #4.607
+miniap_y_MEDIUM_APERTURE=45.245 #46.168 #44.746
+miniap_z_MEDIUM_APERTURE=16.9
+sg_x_MEDIUM_APERTURE=4.04 #4.85 #3.88
+sg_y_MEDIUM_APERTURE=0.15
+
+# 10 micron ap - new block with 200, 20 and 10 micron ap's - REALLY 20 um as miniap_y cannot reach its position for 10 um 
+miniap_x_SMALL_APERTURE=4.3 #4.605 #4.61
+miniap_y_SMALL_APERTURE=49.765 #50.13
+miniap_z_SMALL_APERTURE=16.9
+sg_x_SMALL_APERTURE=4.85 #3.9
+sg_y_SMALL_APERTURE=-4.25 #3.35
+
+
+# Robot load, see Jira ticket I04-421
+miniap_x_ROBOT_LOAD=-4.0 # -4.9
+miniap_y_ROBOT_LOAD=24.9 #0.0 #-48.95 #0.0
+miniap_z_ROBOT_LOAD=16.9
+sg_x_ROBOT_LOAD=-3.0 #-4.9
+sg_y_ROBOT_LOAD=-4.4
+
+# manual mount
+miniap_x_MANUAL_LOAD=-4.0 # -4.9
+miniap_y_MANUAL_LOAD=-48.95 #-49
+miniap_z_MANUAL_LOAD=-12.
+sg_x_MANUAL_LOAD=-3.0 #-4.9
+sg_y_MANUAL_LOAD=-4.4
+
+miniap_x_SCIN_MOVE=-4.0 # -4.9
+sg_x_SCIN_MOVE=-3.0 # -4.9
+
+###I04 Scintillator###
+scin_y_SCIN_IN= 97.28 #20200223 DGA: sister beam removed by dropping scintilator #97.47 #96.92
+scin_y_SCIN_OUT=-0.1 #-0.8 , 17/11/2020 value changed see Jira I04-421
+scin_z_SCIN_IN= 94.08 #93.93 #93.98 # 29-04-20 Home done, scan scin z value, changed from 92.335 to 93.98
+scin_z_SCIN_OUT=0.2
+
+###Tomography Scintillator###
+#scin_y_SCIN_IN=102.0
+#scin_y_SCIN_OUT=-0.1
+#scin_z_SCIN_IN=99.17
+#scin_z_SCIN_OUT=0.2
+
+
+#distance to move gonx,y,z when scintillator is put in with standard pins
+#gon_x_SCIN_OUT_DISTANCE=0.5
+#use with mini kappa:
+#gon_x_SCIN_OUT_DISTANCE_kappa = 1.5
+
+# For SmarGon:
+gon_x_SCIN_OUT_DISTANCE_smargon = 1
+#
+gon_y_SCIN_OUT_DISTANCE=2
+gon_z_SCIN_OUT_DISTANCE=-1.5
+
+# For SmarGon with EM Grid holder (13-03-2018):
+#gon_x_SCIN_OUT_DISTANCE_smargon = 0
+##
+#gon_y_SCIN_OUT_DISTANCE=0
+#gon_z_SCIN_OUT_DISTANCE=0
+
+
+
+#distance to move gonx,y,z when scintillator is put in with crosshair wire mounted
+#gon_x_SCIN_OUT_DISTANCE=-7
+#gon_y_SCIN_OUT_DISTANCE=0
+#gon_z_SCIN_OUT_DISTANCE=0
+
+
+#CASS motor position tolerances (mm)
+miniap_x_tolerance=0.001
+miniap_y_tolerance=0.001
+miniap_z_tolerance=0.1
+sg_x_tolerance=0.1
+sg_y_tolerance=0.1
+scin_y_tolerance=1.2
+scin_z_tolerance=0.1
+gon_x_tolerance=0.01
+gon_y_tolerance=0.1
+gon_z_tolerance=0.001
+bs_x_tolerance=0.005
+bs_y_tolerance=0.005
+bs_z_tolerance=0.2
+crl_x_tolerance=0.01
+crl_y_tolerance=0.01
+crl_pitch_tolerance=0.01
+crl_yaw_tolerance=0.01
+sg_y_up_movement_tolerance=1.0
+
+sg_x_timeout=10
+sg_y_timeout=10
+miniap_x_timeout=10
+miniap_y_timeout=80
+gon_x_timeout=60
+gon_y_timeout=30
+gon_z_timeout=30
+crl_x_timeout=120
+crl_y_timeout=10
+crl_pitch_timeout=10
+crl_yaw_timeout=10
+
+## CRL positions for low and high energy lens sets. Should deliver beam to same position on scintillator. 
+## Normally should only adjust the low energy set to match the position of the high energy that you've
+## already checked on the scintillator screen.
+ 
+#crl_x_LOWE=-7.337
+#crl_y_LOWE=0.785
+#crl_pitch_LOWE=3.030
+#crl_yaw_LOWE=7.245
+
+############################################################################################
+# All values set to NOCRL position to avoid CRL being moved in beam when energy is changed
+# until GDA bug is fixed
+############################################################################################
+
+crl_x_LOWE=0.0
+crl_y_LOWE=0.8277
+crl_pitch_LOWE=3.0065
+crl_yaw_LOWE=7.1015
+
+# values used for tomography, 2013-08-13
+# crl_x_LOWE=-7.11
+# crl_y_LOWE=-1.613
+# crl_pitch_LOWE=1.4
+# crl_yaw_LOWE=-0.16
+
+crl_x_NOCRL    = 0.0
+crl_y_NOCRL    = 0.8277
+crl_pitch_NOCRL= 3.0065
+crl_yaw_NOCRL  = 7.1015
+
+crl_x_HIGHE=0.0
+crl_y_HIGHE=0.8277
+crl_pitch_HIGHE=3.0065
+crl_yaw_HIGHE=7.1015
+
+# values used for tomography, 2013-08-13
+# crl_x_HIGHE=6.69
+# crl_y_HIGHE=-1.54
+# crl_pitch_HIGHE=1.54
+# crl_yaw_HIGHE=-2.6
+
+### Positions with Mirrors ####
+#crl_x_LOWE=-7.5
+#crl_y_LOWE=-1.65
+#crl_pitch_LOWE=1.4
+#crl_yaw_LOWE=0.04
+#
+#crl_x_NOCRL    = 0.0
+#crl_y_NOCRL    = 0.8277
+#crl_pitch_NOCRL= 3.0065
+#crl_yaw_NOCRL  = 7.1015
+#
+#crl_x_HIGHE=6.4
+#crl_y_HIGHE=-1.55
+#crl_pitch_HIGHE=0.74
+#crl_yaw_HIGHE=-1.555
+#################################
+
+
+#Beam visualisation parameters
+MinBackStopZ = 10.0
+BackStopYsafe = 20.0
+BackStopXyag = -17.95
+BackStopYyag = 24.05
+BackStopZyag = 18.0
+SampleYnormal = 2.65
+SampleYshift = 2.0
+parked_fluo_x=1.1
+#in_beam_fluo_x=1.0086
+#in_beam_fluo_x=-35.0
+in_beam_fluo_x=-40.0
+move_fluo = Yes
+safe_det_z_default=1000
+safe_det_z_sampleChanger=333
+store_data_collections_in_ispyb=Yes
+TakePNGsOfSample=Yes
+
+#robot requires these values
+gonio_parked_x=0.0
+gonio_parked_y=0.0
+gonio_parked_z=0.0
+gonio_parked_omega=0
+#gonio_parked_kappa = -6.5
+gonio_parked_kappa = -7.5
+gonio_parked_chi = 0
+gonio_parked_phi = 0
+
+col_inbeam_tolerance = 1.0
+
+#Run 3 2015 - Set offsets to 0 at 12658eV on 25/6/2015 - see standing instruction
+col_parked_tolerance=1.0
+col_parked_upstream_x=0.0
+col_parked_downstream_x=0.0
+col_parked_upstream_y=0.0
+col_parked_inboard_y=0.0
+col_parked_outboard_y=0.0
+
+
+#Run 3 2015 - Set table positions to values at 12658eV on 24/6/2015 after robot taught at 12658eV 
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-42.86
+#col_parked_downstream_x=-48.289
+#col_parked_upstream_y=-40.8887
+#col_parked_inboard_y=-43.0993
+#col_parked_outboard_y=-43.8995
+
+#Run 2 2015 - Set table positions to values at 12658eV on 15/5/2015
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-42.955
+#col_parked_downstream_x=-49.091
+#col_parked_upstream_y=-40.0695
+#col_parked_inboard_y=-42.6522
+#col_parked_outboard_y=-43.3651
+#
+
+#Run 1 2015 -  after commissioning work
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-42.955
+#col_parked_downstream_x=-49.091
+#col_parked_upstream_y=-40.0695
+#col_parked_inboard_y=-42.4963
+#col_parked_outboard_y=-43.2114
+
+#Run 1 2015 - table positions - F-Switch in - new values 20150212
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-42.955
+#col_parked_downstream_x=-49.086
+#col_parked_upstream_y=-40.160
+#col_parked_inboard_y=-42.817
+#col_parked_outboard_y=-43.540
+
+#Run 1 2015 - table positions - F-Switch in - new values 20150212
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-42.955
+#col_parked_downstream_x=-49.086
+#col_parked_upstream_y=-40.160
+#col_parked_inboard_y=-42.913
+#col_parked_outboard_y=-43.646
+
+#Run 1 2015 - table positions - F-Switch in
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-42.6527
+#col_parked_downstream_x=-48.63
+#col_parked_upstream_y=-39.790
+#col_parked_inboard_y=-42.203
+#col_parked_outboard_y=-42.943
+
+#Run 5 2014 - table positions - mirrors in
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-5.9520
+#col_parked_downstream_x=-6.6910
+#col_parked_upstream_y=-5.9514
+#col_parked_inboard_y=-2.1565
+#col_parked_outboard_y=-2.9005
+
+#Run 5 2014 - table positions - F-switch in
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-41.0014
+#col_parked_downstream_x=-46.9717
+#col_parked_upstream_y=-41.8004
+#col_parked_inboard_y=-44.1285
+#col_parked_outboard_y=-44.8705
+
+#Run 4 2014 - table positions found by Mark 09/09/14 - not sure why the table is here??
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-11.075
+#col_parked_downstream_x=-12.617
+#col_parked_upstream_y=-8.2472
+#col_parked_inboard_y=-4.1005
+#col_parked_outboard_y=-4.8838
+
+#Run 4 2014 - table positions found by Mark 09/09/14 - not sure why the table is here??
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-13.3570
+#col_parked_downstream_x=-13.4480
+#col_parked_upstream_y=-6.6296
+#col_parked_inboard_y=-6.2382
+#col_parked_outboard_y=-7.0211
+
+#Run 4 2014 - table positions with mirrors after DCM repair
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-13.3550
+#col_parked_downstream_x=-13.4470
+#col_parked_upstream_y=-8.8012
+#col_parked_inboard_y=-4.0667
+#col_parked_outboard_y=-4.8495
+
+#Run 3 2014 - table positions with mirrors
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=3.406
+#col_parked_downstream_x=3.335
+#col_parked_upstream_y=-9.1149
+#col_parked_inboard_y=-3.5216
+#col_parked_outboard_y=-4.3029
+
+#Run 2 2014 - table positions with mirrors
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=5.307
+#col_parked_downstream_x=4.7740
+#col_parked_upstream_y=-9.0
+#col_parked_inboard_y=-4.2168
+#col_parked_outboard_y=-4.9978
+
+#Run 1 2014 - table positions with mirrors
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=5.427
+#col_parked_downstream_x=4.934
+#col_parked_upstream_y=-9.0
+#col_parked_inboard_y=-4.1168
+#col_parked_outboard_y=-4.8884
+
+#Run 5 2013 - table positions with mirrors
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=4.0475
+#col_parked_downstream_x=4.0255
+#col_parked_upstream_y=-8.9001
+#col_parked_inboard_y=-4.712
+#col_parked_outboard_y=-5.4842
+
+#Run 4 2013 - table positions with mirrors
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=5.049
+#col_parked_downstream_x=4.586
+#col_parked_upstream_y=-13.6546
+#col_parked_inboard_y=-8.8095
+#col_parked_outboard_y=-9.5794
+
+#Run 3 2013 - table positions with mirrors
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=3.70
+#col_parked_downstream_x=2.01
+#col_parked_upstream_y=-12.6639
+#col_parked_inboard_y=-9.5996
+#col_parked_outboard_y=-10.3697
+
+#Run 2 2013 - table positions with mirrors
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=3.85
+#col_parked_downstream_x=1.86
+#col_parked_upstream_y=-12.6651
+#col_parked_inboard_y=-9.6002
+#col_parked_outboard_y=-10.3698
+
+#Run 1 2013 - table positions with mirrors
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=4.405
+#col_parked_downstream_x=3.004
+#col_parked_upstream_y=-16.1408
+#col_parked_inboard_y=-13.0856
+#col_parked_outboard_y=-13.7957
+
+
+###CRL Table positions
+# Run 5 2012 - robot load collimation table reference positions (mm)
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-38.763
+#col_parked_downstream_x=-45.4609
+#col_parked_upstream_y=-43.89
+#col_parked_inboard_y=-44.2357
+#col_parked_outboard_y=-45.0415
+
+
+# Run 5 2012 - robot load collimation table reference positions (mm)
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-36.395
+#col_parked_downstream_x=-43.53
+#col_parked_upstream_y=-45.5755
+#col_parked_inboard_y=-45.8817
+#col_parked_outboard_y=-46.6874
+
+# Run 1 2012 - robot load collimation table reference positions (mm)
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-38.713
+#col_parked_downstream_x=-45.457
+#col_parked_upstream_y=-43.89
+#col_parked_inboard_y=-44.2357
+#col_parked_outboard_y=-45.0415
+
+# Run 4 2012 - robot load collimation table reference positions (mm) before #12/09/2012 13:00 pm
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-38.713
+#col_parked_downstream_x=-45.67
+#col_parked_upstream_y=-44.1
+#col_parked_inboard_y=-44.4198
+#col_parked_outboard_y=-45.2073
+
+# Run 4 - robot load collimation table reference positions (mm)
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-37.829
+#col_parked_downstream_x=-44.646
+#col_parked_upstream_y=-43.9968
+#col_parked_inboard_y=-44.3007
+#col_parked_outboard_y=-45.0869
+
+# Run 3 - robot load collimation table reference positions (mm)
+#col_parked_tolerance=1.0
+#col_parked_upstream_x=-37.161
+#col_parked_downstream_x=-42.732
+#col_parked_upstream_y=-44.176
+#col_parked_inboard_y=-44.4801
+#col_parked_outboard_y=-45.2667
+
+# The following used by setupBeamLine script
+setupBeamLine_energyStart = 6000.
+setupBeamLine_energyEnd = 18000.
+setupBeamLine_energyStep = 500.
+setupBeamLine_rollStart = -1.95
+setupBeamLine_rollEnd = -1.55
+setupBeamLine_rollSteps = 80
+setupBeamLine_pitchStart = -0.65
+setupBeamLine_pitchEnd = -0.45
+setupBeamLine_pitchSteps = 200
+#values below in microns
+beamXCentre=0.
+beamYCentre=0.
+beamXYSettleTime=6.0
+beamXYTolerance=5.0
+DataCollection_TurboMode=Yes
+#time in seconds. If not set then the default is 0.1
+
+#The following are used by beamLineenergy script
+beamLineEnergy_rollBeamX 100
+beamLineEnergy_rollBeamY 400
+beamLineEnergy__rollWidth = .075
+beamLineEnergy__rollStep = .005
+beamLineEnergy__pitchWidth = .025
+beamLineEnergy__pitchStep = .001
+beamLineEnergy__fpitchWidth = .02
+beamLineEnergy__fpitchStep = .001
+beamLineEnergy__adjustSlits=Yes
+
+# "Beam stabilising, data collection will resume in " ...
+dataCollectionMinSampleCurrent=-100
+dataCollectionSampleCurrent XBPM1Intensity
+
+#Mark is using the following in some test scripts
+MinIPin = 1.0
+YAGPin = 1
+RotationAxisPin = 2
+PtPin = 3
+PowderPin = 4
+
+####################################################################
+# I04 standard use settings
+#
+# Do Not Edit/Delete - Ralf - 31/1/2013
+#
+# iPin In positions, Mark is going to try and use these in scripts
+iPinInDetX = 31.52
+iPinInDetYaw = 1.4542
+iPinInDetY = 93.0
+iPinInDetZ = 200.0
+######################################################################
+
+
+####################################################################
+#
+# iPin Out positions - for diffraction data collection with ADSC with CRLS
+#
+#DataCollectionDetY           = 58.7
+#DataCollectionDetX           = -42.5498
+#DataCollectionDetXUpstream   = -26.9237
+#DataCollectionDetXDownstream = -57.8741
+#DataCollectionDetYaw         = -37.32719
+####################################################################
+
+####################################################################
+#
+# iPin Out positions - for diffraction data collection with ADSC with Mirrors
+#
+DataCollectionDetY           =  89.7
+DataCollectionDetX           =  27.4
+DataCollectionDetXUpstream   =  26.4
+DataCollectionDetXDownstream =  28.402
+DataCollectionDetYaw         =  2.4132
+####################################################################
+
+####################################################################
+## I04 tomography settings - PCO camera
+#
+# values updated 07/07/12
+# iPin In positions, Mark is going to try and use these in scripts
+#iPinInDetX = 8.854
+#iPinInDetYaw = -30.0909
+#iPinInDetY = 315.2
+#iPinInDetZ = 300.0
+####################################################################
+
+
+# StandardEnergy on i04 is 12658eV
+StandardEnergy=12658
+
+
+keyence_max_attempts=1
+keyence_slopeYToX=6.78
+keyence_slopeYToY=-6.72
+keyence_slopeXToZ=8.37
+
+
+# WITH MIRRORS #
+#hfm_bare_vert = 5.0
+#hfm_bare_yaw  = 0.0
+#hfm_bare_roll = 0.0
+#hfm_rh_vert   = 5.0
+#hfm_rh_yaw    = 0.0
+#hfm_rh_roll   = 0.0
+#hfm_pt_vert   = 5.0
+#hfm_pt_yaw    = 0.0
+#hfm_pt_roll   = 0.0
+
+#vfm_bare_lat  = 2.000
+#vfm_bare_yaw  = 0.0
+#vfm_bare_roll = 0.0
+#vfm_rh_lat    = 15.00
+#vfm_rh_yaw    = 0.0
+#vfm_rh_roll   = 0.0
+#vfm_pt_lat    = -10
+#vfm_pt_yaw    = 0.0
+#vfm_pt_roll   = 0.0
+
+# WITH CRLS #
+hfm_bare_vert = -30
+hfm_bare_yaw  = -30.0
+hfm_bare_roll = -30.0
+hfm_rh_vert   = -30.0
+hfm_rh_yaw    = -30.0
+hfm_rh_roll   = -30.0
+hfm_pt_vert   = -30.0
+hfm_pt_yaw    = -30.0
+hfm_pt_roll   = -30.0
+
+vfm_bare_lat  = 15
+vfm_bare_yaw  = 15
+vfm_bare_roll = 15
+vfm_rh_lat    = 15
+vfm_rh_yaw    = 15
+vfm_rh_roll   = 15
+vfm_pt_lat    = 15
+vfm_pt_yaw    = 15
+vfm_pt_roll   = 15
+
+# energy thresholds for mirror stripes
+#  - first threshold is between bare/Rh stripes (e.g. 7000)
+#  - second threshold is between Rh/Pt stripes (e.g. 18000)
+mirror_threshold_bare_rh = 6900
+mirror_threshold_rh_pt   = 30000
+
+# flux conversion factors
+#flux_factor_no_aperture     = 1.0
+flux_factor_LARGE_APERTURE  = 1.0
+#flux_factor_LARGE_APERTURE  = 0.93557
+flux_factor_MEDIUM_APERTURE = 0.11765
+flux_factor_SMALL_APERTURE  = 0.00914
+flux_scale_factor = 0.372
+
+# assuming gain 10^3
+#pin_diode_factor = 3.2E12 original
+#from cross-calibration with calibrated diode
+pin_diode_factor = 2.83E12
+
+#ipin value must be < ipin_threshold above background for data collection
+ipin_threshold = 0.1
+
+#Predict flux by energy and beamsize settings #I04-521 
+flux_predict_polynomial_coeficients_5 =   [-0.00025330716357132297, 13.485859377720622, -256758.95679718192, 1985259244.704782, -4573633731326.617] 
+flux_predict_polynomial_coeficients_10 =  [-0.00024042589940838382, 12.91542926556411, -248077.7278820356, 1933146920.7938995, -4468947107375.463]
+flux_predict_polynomial_coeficients_15 =  [-0.0003337078088343525, 17.585248596326853, -332399.0006318421, 2576552956.697947, -6180201810530.737]
+flux_predict_polynomial_coeficients_20 =  [-0.0003012883660588973, 15.924333631310516, -301471.8171746345, 2328703563.7557583, -5452309728067.897]
+flux_predict_polynomial_coeficients_30 =  [-0.0003080207059641305, 16.276153642439972, -307961.87096418656, 2374420903.797596, -5514134456942.98]
+flux_predict_polynomial_coeficients_40 =  [-0.00036978125781110196, 19.483483160005783, -368378.44719471707, 2857139344.320359, -6851466882405.119]
+flux_predict_polynomial_coeficients_50 =  [-0.0002797754857549022, 14.821097189237454, -280122.2122662991, 2134064265.160059, -4677155093888.3545]
+flux_predict_polynomial_coeficients_75 =  [-0.0003791104340953961, 19.935250228365668, -375450.79859067535, 2883965596.6160245, -6688648985945.789]
+flux_predict_polynomial_coeficients_100 = [-0.00041687366729023485, 21.9022122871612, -412140.6767831686, 3164283122.0895624, -7349006719703.563]
+
+#Fluorescence/Vortex  detector settings
+attenuation_optimisation_type = deadtime # deadtime or total_counts
+
+#Deadtime settings
+fluorescence_analyser_deadtimeThreshold=0.0001 # used by edge scans
+fluorescence_spectrum_deadtimeThreshold=0.0005 # used by spectrum
+
+#Other settings
+fluorescence_attenuation_low_roi = 100 
+fluorescence_attenuation_high_roi = 2047
+attenuation_optimisation_optimisation_cycles = 10
+attenuation_optimisation_start_transmission = 1 # per cent
+
+#Total count settings
+attenuation_optimisation_multiplier = 2
+attenuation_optimisation_target_count = 28000
+attenuation_optimisation_upper_limit = 50000
+attenuation_optimisation_lower_limit = 20000

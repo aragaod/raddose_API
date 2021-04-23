@@ -4,6 +4,24 @@ from libs.raddose_wrapper import raddose
 from libs.lookuptables import flux_bs_lookup
 from decimal import Decimal
 from datetime import timedelta
+from enum import Enum
+
+# Beamlines = Enum(
+#    "Beamlines",
+#    {
+#        "i03": "i03",
+#        "i04": "i04",
+#        "i04-1": "i04-1",
+#        "i24": "i24",
+#    },
+# )
+
+
+class Beamlines(str, Enum):
+    i03 = "i03"
+    i04 = "i04"
+    i041 = "i04-1"
+    i24 = "i24"
 
 
 tags_metadata = [
@@ -250,18 +268,28 @@ def read_item(
     vsize_sp: int = Query(
         None, description="Vertical beamsize set point (microns)", title="in microns"
     ),
+    beamline: Beamlines = Query(None, description="MX beamline"),
 ):
+
+    if beamline == "i03" or beamline == "i24" or beamline == "i04-1":
+        print(str(beamline))
+        print(type(beamline))
+        return json.dumps("Not implemented for that beamline yet")
 
     lookup = flux_bs_lookup(
         ["i04:energy_flux:lookup:20210414", "i04:energy_flux:lookup:20210414b"]
     )
     print("Re-calculated polinomial fits")
     flux = lookup.calculate_flux(energy, vsize_sp)
+    if isinstance(flux, str):
+        flux_sn = flux
+    else:
+        flux_sn = ("{:.5E}".format(flux),)
     n_lenses = lookup.calc_filters(vsize_sp, energy)
     real_bs = lookup.calc_beamsize_from_lenses(n_lenses, energy)
     return {
         "flux": flux,
-        "flux_sn": "{:.5E}".format(flux),
+        "flux_sn": flux_sn,
         "real_h_size": real_bs[0],
         "real_v_size": real_bs[1],
         "extra": {
