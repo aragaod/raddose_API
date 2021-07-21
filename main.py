@@ -75,7 +75,7 @@ app = FastAPI(
 )
 
 # DLS_scratch_folder = '/scratch/raddose3d/'
-DLS_scratch_folder = "/run/user/1007182/raddose3d/cache/"
+DLS_scratch_folder = f"/run/user/{os.getuid()}/raddose3d/cache/"
 
 # methods = {"getdose": "-get_dose", "getexposure": "-getexposure"}
 
