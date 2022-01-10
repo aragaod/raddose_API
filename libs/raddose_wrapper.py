@@ -14,7 +14,7 @@ from pprint import pprint
 from time import time
 
 from beamline import redis
-
+from beamline import ID
 
 class raddose:
     template = """
@@ -254,7 +254,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
 
     def get_redis_key(self):
         redistemplate = self.get_template_name().replace("_", ":")
-        rediskey = f"i04:raddose3d:{redistemplate}"
+        rediskey = f"{ID}:raddose3d:{redistemplate}"
         return rediskey
 
     def get_template_name(self):
