@@ -3,7 +3,7 @@ import json
 import numpy
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import bz2
 
 class flux_bs_lookup(object):
     def __init__(self, list_of_redis_keys):
@@ -19,7 +19,7 @@ class flux_bs_lookup(object):
         return df
 
     def download_data_to_df(self, key):
-        payload = json.loads(redis.get(key))
+        payload = json.loads(bz2.decompress(redis.get(key)))
         print(f"Loaded {len(payload)} data entries for {key}")
         df = pd.DataFrame(payload)
 

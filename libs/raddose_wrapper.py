@@ -61,7 +61,10 @@ FWHM {beam_size_x} {beam_size_y} #in µm, X and Y for a Gaussian beam
                           # horizontal goniometer
                           # Opposite for a vertical goniometer
 
-Energy {photon_energy}     # in keV
+Energy {photon_energy} KEV
+
+#Set the below for non DCM (e.g. DMM) in KeV
+{energy_bandpass_string}
 
 Collimation Rectangular 100 100 # 100 100 # X/Y collimation of the beam in µm
                                 # X = vertical and Y = horizontal for a
@@ -82,7 +85,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
 #AngularResolution 3     # Only change from the defaults when using very
                           # small wedges, e.g 5°.
     """
-    input_filename_template = "{size_x:.1f}_{size_y:.1f}_{size_z:.1f}_{comp_reso:.1f}_{unit_cell_a:.1f}_{unit_cell_b:.1f}_{unit_cell_c:.1f}_{number_of_monomers:d}_{number_of_residues:d}_{elements_protein_concentration:f}_{elements_solvent_concentration:f}_{solvent_fraction:.2f}_{flux:s}_{beam_size_x:.1f}_{beam_size_y:.1f}_{photon_energy:.2f}_{oscillation_start:.1f}_{oscillation_end:.1f}_{total_exposure_time:.1f}.txt"
+    input_filename_template = "{size_x:.1f}_{size_y:.1f}_{size_z:.1f}_{comp_reso:.1f}_{unit_cell_a:.1f}_{unit_cell_b:.1f}_{unit_cell_c:.1f}_{number_of_monomers:d}_{number_of_residues:d}_{elements_protein_concentration:f}_{elements_solvent_concentration:f}_{solvent_fraction:.2f}_{flux:s}_{beam_size_x:.1f}_{beam_size_y:.1f}_{photon_energy:.2f}_{photon_energy_FWHM:.3f}_{oscillation_start:.1f}_{oscillation_end:.1f}_{total_exposure_time:.1f}.txt"
 
     def __init__(
         self,
@@ -102,6 +105,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
         beam_size_x=10.0,
         beam_size_y=5.0,
         photon_energy=12.65,
+        photon_energy_FWHM=0.000,
         oscillation_start=0.0,
         oscillation_end=360.0,
         total_exposure_time=90.0,
@@ -126,6 +130,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
         self.beam_size_x = beam_size_x
         self.beam_size_y = beam_size_y
         self.photon_energy = photon_energy
+        self.photon_energy_FWHM = photon_energy_FWHM
         self.oscillation_start = oscillation_start
         self.oscillation_end = oscillation_end
         self.total_exposure_time = total_exposure_time
@@ -141,6 +146,10 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
         ]
 
     def get_parameters(self):
+        if self.photon_energy_FWHM:
+            energy_bandpass_string = f"ENERGYFWHM {self.photon_energy_FWHM} #bandpass assuming gaussian in KeV"
+        else:
+            energy_bandpass_string = f"#ENERGYFWHM not set"
         parameters = {
             "size_x": self.size_x,
             "size_y": self.size_y,
@@ -158,6 +167,8 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
             "beam_size_x": self.beam_size_x,
             "beam_size_y": self.beam_size_y,
             "photon_energy": self.photon_energy,
+            "photon_energy_FWHM": self.photon_energy_FWHM, 
+            "energy_bandpass_string": energy_bandpass_string,
             "oscillation_start": self.oscillation_start,
             "oscillation_end": self.oscillation_end,
             "total_exposure_time": self.total_exposure_time,
@@ -180,6 +191,8 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
             return
         if not os.path.isdir(os.path.dirname(input_filename)):
             os.makedirs(os.path.dirname(input_filename))
+
+        #
         text = self.template.format(**self.get_parameters())
         f = open(self.get_input_filename(), "w")
         f.write(text)
@@ -189,7 +202,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
 
     def get_raddose_binary_path(self):
         install_path = "/dls_sw/apps/raddose/3D-4.0/raddose3d.jar"
-        memory_path = "/run/user/1007182/raddose3d/raddose3d.jar"
+        memory_path = os.path.join(self.get_output_directory(),"raddose3d.jar")
         if os.path.isfile(memory_path):
             return memory_path
         else:

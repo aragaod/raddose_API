@@ -1,3 +1,7 @@
+"""
+Main daemon to run that setups up a HTTP restfull API for raddose3D java program
+"""
+
 from fastapi import FastAPI, Query
 import subprocess, sys, json, uuid, os
 from libs.raddose_wrapper import raddose
@@ -130,6 +134,7 @@ def read_item(
         None, description="Beam vertical size (microns)", title="in microns"
     ),
     energy_kev: float = Query(None, description="X-ray energy (kev)", title="kev"),
+    energy_bandpass_kev: float = Query(None, description="X-ray energy bandpass (kev) leave empty for DCM", title="kev"),
     oscillation_start: float = Query(
         None, description="Starting angle for dataset (degrees)", title="degrees"
     ),
@@ -157,6 +162,7 @@ def read_item(
         "beam_size_x": beam_size_x,
         "beam_size_y": beam_size_y,
         "photon_energy": energy_kev,
+	"photon_energy_FWHM": energy_bandpass_kev,
         "oscillation_start": oscillation_start,
         "oscillation_end": oscillation_end,
         "total_exposure_time": total_exposure_time,
@@ -218,6 +224,7 @@ def read_item(
         None, description="Beam vertical size (microns)", title="in microns"
     ),
     energy_kev: float = Query(None, description="X-ray energy (kev)", title="kev"),
+    energy_bandpass_kev: float = Query(None, description="X-ray energy bandpass (kev) leave empty for DCM", title="kev"),
     oscillation_start: float = Query(
         None, description="Starting angle for dataset (Degrees)", title="degrees"
     ),
@@ -251,6 +258,7 @@ def read_item(
         "beam_size_x": beam_size_x,
         "beam_size_y": beam_size_y,
         "photon_energy": energy_kev,
+        "photon_energy_FWHM": energy_bandpass_kev,
         "oscillation_start": oscillation_start,
         "oscillation_end": oscillation_end,
     }
@@ -264,7 +272,7 @@ def read_item(
 
 @app.get("/api/v1.0/getflux", tags=["getflux"])
 def read_item(
-    energy: float = Query(None, description="Energy (eV)", title="in eVs"),
+    energy: float = Query(None, description="Energy (KeV)", title="in KeVs"),
     vsize_sp: int = Query(
         None, description="Vertical beamsize set point (microns)", title="in microns"
     ),
@@ -276,9 +284,15 @@ def read_item(
         print(type(beamline))
         return json.dumps("Not implemented for that beamline yet")
 
+    if energy < 6.0 or energy > 18.0:
+        print(str(beamline))
+        return json.dumps(f"Energy outside range 6 KeV < {energy} < 18.0 Kev")
+
     lookup = flux_bs_lookup(
-        ["i04:energy_flux:lookup:20210414", "i04:energy_flux:lookup:20210414b"]
+        ["i04:energy_flux:lookup:20220205"]
     )
+
+    energy = energy *1000
     print("Re-calculated polinomial fits")
     flux = lookup.calculate_flux(energy, vsize_sp)
     if isinstance(flux, str):
