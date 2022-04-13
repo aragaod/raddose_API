@@ -134,7 +134,9 @@ def read_item(
         None, description="Beam vertical size (microns)", title="in microns"
     ),
     energy_kev: float = Query(None, description="X-ray energy (kev)", title="kev"),
-    energy_bandpass_kev: float = Query(None, description="X-ray energy bandpass (kev) leave empty for DCM", title="kev"),
+    energy_bandpass_kev: float = Query(
+        None, description="X-ray energy bandpass (kev) leave empty for DCM", title="kev"
+    ),
     oscillation_start: float = Query(
         None, description="Starting angle for dataset (degrees)", title="degrees"
     ),
@@ -162,7 +164,7 @@ def read_item(
         "beam_size_x": beam_size_x,
         "beam_size_y": beam_size_y,
         "photon_energy": energy_kev,
-	"photon_energy_FWHM": energy_bandpass_kev,
+        "photon_energy_FWHM": energy_bandpass_kev,
         "oscillation_start": oscillation_start,
         "oscillation_end": oscillation_end,
         "total_exposure_time": total_exposure_time,
@@ -224,7 +226,9 @@ def read_item(
         None, description="Beam vertical size (microns)", title="in microns"
     ),
     energy_kev: float = Query(None, description="X-ray energy (kev)", title="kev"),
-    energy_bandpass_kev: float = Query(None, description="X-ray energy bandpass (kev) leave empty for DCM", title="kev"),
+    energy_bandpass_kev: float = Query(
+        None, description="X-ray energy bandpass (kev) leave empty for DCM", title="kev"
+    ),
     oscillation_start: float = Query(
         None, description="Starting angle for dataset (Degrees)", title="degrees"
     ),
@@ -288,11 +292,9 @@ def read_item(
         print(str(beamline))
         return json.dumps(f"Energy outside range 6 KeV < {energy} < 18.0 Kev")
 
-    lookup = flux_bs_lookup(
-        ["i04:energy_flux:lookup:20220205"]
-    )
+    lookup = flux_bs_lookup(["i04:energy_flux:lookup:20220402b"])
 
-    energy = energy *1000
+    energy = energy * 1000
     print("Re-calculated polinomial fits")
     flux = lookup.calculate_flux(energy, vsize_sp)
     if isinstance(flux, str):
