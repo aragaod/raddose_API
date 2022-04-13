@@ -34,22 +34,19 @@ parked_z_robot = 49.15 #55, 17/11/2020 value changed see Jira I04-421
 
 in_beam_z_MIN_START_POS = 49.5 #40.0
 
-in_beam_x_STANDARD = -2.5 
-#in_beam_y_STANDARD = 35.0 #45.91 #46.45
-in_beam_y_STANDARD = 45.65 #45.62 #45.52 #45.46 (16/02)  #45.3 (14/12) 
+in_beam_x_STANDARD = -2.7 #-2.8
+in_beam_y_STANDARD = 45.74 #45.76 #45.72 #45.73 #45.70 #45.75 (09/Apr/2022)
 in_beam_z_STANDARD = 25.0
 
 
-in_beam_x_HIGHRES = -2.5 #-3.84
-#in_beam_y_HIGHRES = 48.42 # 45.92
-in_beam_y_HIGHRES = 45.65 #45.62 #45.52 #45.52 #45.46 (16/02)
+in_beam_x_HIGHRES = -2.70 #2.50 #-3.84
+in_beam_y_HIGHRES = 45.74 #45.76 #45.72 #45.73 #45.73 #45.70   (09/Apr/2022)
 #in_beam_z_HIGHRES = 12
 # this is used for fluo spectra; original distance 0f 12.0 gives W contamination
 in_beam_z_HIGHRES = 25.0
 
-in_beam_x_LOWRES = -2.50 # -3.84
-#in_beam_y_LOWRES = 48.35 # 45.86
-in_beam_y_LOWRES = 45.63 #45.64 #45.58 #45.48 #45.46 #45.42 #45.23 #45.2 #45.23  #45.2 (16/02)
+in_beam_x_LOWRES = -2.60 # -3.84
+in_beam_y_LOWRES = 45.68 #45.70 #45.67 #45.68 #45.68 #45.67 #45.69  (09/Apr/2022)
 in_beam_z_LOWRES = 49.50
 
 
@@ -75,14 +72,14 @@ manualCryojet=Yes
 #sg_y_LARGE_APERTURE=-4.4
 
 
-# 20 micron ap - new block with 200, 20 and 10 micron ap's - 
+# 20 micron ap - new block with 200, 20 and 10 micron ap's -
 #miniap_x_MEDIUM_APERTURE=-4.0
 #miniap_y_MEDIUM_APERTURE=-48.95
 #miniap_z_MEDIUM_APERTURE=-12.0
 #sg_x_MEDIUM_APERTURE=-3.0
 #sg_y_MEDIUM_APERTURE=-4.4
 
-# 10 micron ap - new block with 200, 20 and 10 micron ap's - REALLY 20 um as miniap_y cannot reach its position for 10 um 
+# 10 micron ap - new block with 200, 20 and 10 micron ap's - REALLY 20 um as miniap_y cannot reach its position for 10 um
 #miniap_x_SMALL_APERTURE=-4.0
 #miniap_y_SMALL_APERTURE=-48.95
 #miniap_z_SMALL_APERTURE=-12.0
@@ -90,17 +87,17 @@ manualCryojet=Yes
 #sg_y_SMALL_APERTURE=-4.4
 
 # Robot load
-#miniap_x_ROBOT_LOAD=-4.0 
+#miniap_x_ROBOT_LOAD=-4.0
 #miniap_y_ROBOT_LOAD=-48.95
 #miniap_z_ROBOT_LOAD=-12.0
-#sg_x_ROBOT_LOAD=-3.0 
+#sg_x_ROBOT_LOAD=-3.0
 #sg_y_ROBOT_LOAD=-4.4
 
 # manual mount
 #miniap_x_MANUAL_LOAD=-4.0
 #miniap_y_MANUAL_LOAD=-48.95
 #miniap_z_MANUAL_LOAD=-12.0
-#sg_x_MANUAL_LOAD=-3.0 
+#sg_x_MANUAL_LOAD=-3.0
 #sg_y_MANUAL_LOAD=-4.4
 
 
@@ -115,21 +112,21 @@ manualCryojet=Yes
 ###############################################################################
 #Aperture - Scatterguard positions new block with 200, 20 and 10 micron ap's
 #200 micron ap updated 2015-09-09
-miniap_x_LARGE_APERTURE= 4.34 #3.65 # 4.29 #4.500 #4.6843 #4.717 #4.7
-miniap_y_LARGE_APERTURE= 41.8184 #41.25 #41.5384 #41.801 #42.155 #40.7385
+miniap_x_LARGE_APERTURE= 4.34 #4.35 #4.34 #3.65 # 4.29 #4.500 #4.6843 #4.717 #4.7
+miniap_y_LARGE_APERTURE= 41.86 #41.88 #41.8184 #41.25 #41.5384 #41.801 #42.155 #40.7385
 miniap_z_LARGE_APERTURE=16.9
-sg_x_LARGE_APERTURE=4.800 #4.8 #4.4782 #4.85 #3.9
+sg_x_LARGE_APERTURE=4.78 #4.800 #4.8 #4.4782 #4.85 #3.9
 sg_y_LARGE_APERTURE=4.682 #4.137 #3.6589 #3.68 #3.4
 
 
-# 20 micron ap - new block with 200, 20 and 10 micron ap's - 
+# 20 micron ap - new block with 200, 20 and 10 micron ap's -
 miniap_x_MEDIUM_APERTURE=4.303 #4.65 #4.607
 miniap_y_MEDIUM_APERTURE=45.245 #46.168 #44.746
 miniap_z_MEDIUM_APERTURE=16.9
 sg_x_MEDIUM_APERTURE=4.04 #4.85 #3.88
 sg_y_MEDIUM_APERTURE=0.15
 
-# 10 micron ap - new block with 200, 20 and 10 micron ap's - REALLY 20 um as miniap_y cannot reach its position for 10 um 
+# 10 micron ap - new block with 200, 20 and 10 micron ap's - REALLY 20 um as miniap_y cannot reach its position for 10 um
 miniap_x_SMALL_APERTURE=4.3 #4.605 #4.61
 miniap_y_SMALL_APERTURE=49.765 #50.13
 miniap_z_SMALL_APERTURE=16.9
@@ -155,9 +152,9 @@ miniap_x_SCIN_MOVE=-4.0 # -4.9
 sg_x_SCIN_MOVE=-3.0 # -4.9
 
 ###I04 Scintillator###
-scin_y_SCIN_IN= 97.28 #20200223 DGA: sister beam removed by dropping scintilator #97.47 #96.92
+scin_y_SCIN_IN= 97.25 #97.1 #96.22 #93.42 #96.92
 scin_y_SCIN_OUT=-0.1 #-0.8 , 17/11/2020 value changed see Jira I04-421
-scin_z_SCIN_IN= 94.08 #93.93 #93.98 # 29-04-20 Home done, scan scin z value, changed from 92.335 to 93.98
+scin_z_SCIN_IN= 93.87 #93.97 # 01-04-22 Home done, scan scin z value
 scin_z_SCIN_OUT=0.2
 
 ###Tomography Scintillator###
@@ -174,6 +171,10 @@ scin_z_SCIN_OUT=0.2
 
 # For SmarGon:
 gon_x_SCIN_OUT_DISTANCE_smargon = 1
+
+#Required for single axis because _smargon won't be used
+#gon_x_SCIN_OUT_DISTANCE=1.0
+
 #
 gon_y_SCIN_OUT_DISTANCE=2
 gon_z_SCIN_OUT_DISTANCE=-1.5
@@ -224,10 +225,10 @@ crl_y_timeout=10
 crl_pitch_timeout=10
 crl_yaw_timeout=10
 
-## CRL positions for low and high energy lens sets. Should deliver beam to same position on scintillator. 
+## CRL positions for low and high energy lens sets. Should deliver beam to same position on scintillator.
 ## Normally should only adjust the low energy set to match the position of the high energy that you've
 ## already checked on the scintillator screen.
- 
+
 #crl_x_LOWE=-7.337
 #crl_y_LOWE=0.785
 #crl_pitch_LOWE=3.030
@@ -322,7 +323,7 @@ col_parked_inboard_y=0.0
 col_parked_outboard_y=0.0
 
 
-#Run 3 2015 - Set table positions to values at 12658eV on 24/6/2015 after robot taught at 12658eV 
+#Run 3 2015 - Set table positions to values at 12658eV on 24/6/2015 after robot taught at 12658eV
 #col_parked_tolerance=1.0
 #col_parked_upstream_x=-42.86
 #col_parked_downstream_x=-48.289
@@ -618,6 +619,8 @@ StandardEnergy=12658
 
 
 keyence_max_attempts=1
+#Keyence on YtoX and YtoY needs changing is using single axis
+#See comment in I04-532 for details
 keyence_slopeYToX=6.78
 keyence_slopeYToY=-6.72
 keyence_slopeXToZ=8.37
@@ -687,18 +690,19 @@ pin_diode_factor = 2.83E12
 #ipin value must be < ipin_threshold above background for data collection
 ipin_threshold = 0.1
 
-#Predict flux by energy and beamsize settings #I04-521 
-flux_predict_polynomial_coeficients_5 =   [-0.00025330716357132297, 13.485859377720622, -256758.95679718192, 1985259244.704782, -4573633731326.617] 
-flux_predict_polynomial_coeficients_10 =  [-0.00024042589940838382, 12.91542926556411, -248077.7278820356, 1933146920.7938995, -4468947107375.463]
-flux_predict_polynomial_coeficients_15 =  [-0.0003337078088343525, 17.585248596326853, -332399.0006318421, 2576552956.697947, -6180201810530.737]
-flux_predict_polynomial_coeficients_20 =  [-0.0003012883660588973, 15.924333631310516, -301471.8171746345, 2328703563.7557583, -5452309728067.897]
-flux_predict_polynomial_coeficients_30 =  [-0.0003080207059641305, 16.276153642439972, -307961.87096418656, 2374420903.797596, -5514134456942.98]
-flux_predict_polynomial_coeficients_40 =  [-0.00036978125781110196, 19.483483160005783, -368378.44719471707, 2857139344.320359, -6851466882405.119]
-flux_predict_polynomial_coeficients_50 =  [-0.0002797754857549022, 14.821097189237454, -280122.2122662991, 2134064265.160059, -4677155093888.3545]
-flux_predict_polynomial_coeficients_75 =  [-0.0003791104340953961, 19.935250228365668, -375450.79859067535, 2883965596.6160245, -6688648985945.789]
-flux_predict_polynomial_coeficients_100 = [-0.00041687366729023485, 21.9022122871612, -412140.6767831686, 3164283122.0895624, -7349006719703.563]
+# Predict flux by energy and beamsize settings #I04-521
+# N.B. Left most coefficient (at index 0 in the collection / array) is the quartic term, the right most coefficient is the zeroth order "offset" term
+flux_predict_polynomial_coefficients_5 =   [-0.00025330716357132297, 13.485859377720622, -256758.95679718192, 1985259244.704782, -4573633731326.617] 
+flux_predict_polynomial_coefficients_10 =  [-0.00024042589940838382, 12.91542926556411, -248077.7278820356, 1933146920.7938995, -4468947107375.463]
+flux_predict_polynomial_coefficients_15 =  [-0.0003337078088343525, 17.585248596326853, -332399.0006318421, 2576552956.697947, -6180201810530.737]
+flux_predict_polynomial_coefficients_20 =  [-0.0003012883660588973, 15.924333631310516, -301471.8171746345, 2328703563.7557583, -5452309728067.897]
+flux_predict_polynomial_coefficients_30 =  [-0.0003080207059641305, 16.276153642439972, -307961.87096418656, 2374420903.797596, -5514134456942.98]
+flux_predict_polynomial_coefficients_40 =  [-0.00036978125781110196, 19.483483160005783, -368378.44719471707, 2857139344.320359, -6851466882405.119]
+flux_predict_polynomial_coefficients_50 =  [-0.0002797754857549022, 14.821097189237454, -280122.2122662991, 2134064265.160059, -4677155093888.3545]
+flux_predict_polynomial_coefficients_75 =  [-0.0003791104340953961, 19.935250228365668, -375450.79859067535, 2883965596.6160245, -6688648985945.789]
+flux_predict_polynomial_coefficients_100 = [-0.00041687366729023485, 21.9022122871612, -412140.6767831686, 3164283122.0895624, -7349006719703.563]
 
-#Fluorescence/Vortex  detector settings
+# Fluorescence/Vortex  detector settings
 attenuation_optimisation_type = deadtime # deadtime or total_counts
 
 #Deadtime settings
@@ -706,7 +710,7 @@ fluorescence_analyser_deadtimeThreshold=0.0001 # used by edge scans
 fluorescence_spectrum_deadtimeThreshold=0.0005 # used by spectrum
 
 #Other settings
-fluorescence_attenuation_low_roi = 100 
+fluorescence_attenuation_low_roi = 100
 fluorescence_attenuation_high_roi = 2047
 attenuation_optimisation_optimisation_cycles = 10
 attenuation_optimisation_start_transmission = 1 # per cent
