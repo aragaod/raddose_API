@@ -5,11 +5,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import bz2
 
+
 class flux_bs_lookup(object):
     def __init__(self, list_of_redis_keys):
         self.df = self.setup_df(list_of_redis_keys)
         self.slices_dfs = self.slice_beamsizes(self.df)
         self.models = self.polinomial_fit(degree=4)
+        self.print_for_GDA()
+
+    def print_for_GDA(self):
+        for size in self.models:
+            print(
+                f"flux_predict_polynomial_coefficients_{size} = {list(self.models[size])}"
+            )
 
     def setup_df(self, keys):
         payload = []
@@ -89,11 +97,18 @@ class flux_bs_lookup(object):
     def polinomial_fit(self, degree=4):
         models = {}
         for key in self.slices_dfs:
-            models[key] = numpy.poly1d(
-                numpy.polyfit(
-                    self.slices_dfs[key].energy, self.slices_dfs[key].normalised_flux, 4
+            try:
+                models[key] = numpy.poly1d(
+                    numpy.polyfit(
+                        self.slices_dfs[key].energy,
+                        self.slices_dfs[key].normalised_flux,
+                        4,
+                    )
                 )
-            )
+            except TypeError:
+                print(
+                    f"Data for beamsize {key} is not good to compute a polinomial_fit"
+                )
         return models
 
     def calculate_flux(self, energy, v_size_sp):
@@ -110,21 +125,21 @@ class flux_bs_lookup(object):
         # 	k = 55.055 / (vertical + 198.0)
         E = energy_eV / 1000.0
         k = 53.85 / (vertical + 198.0)
-        N = k * (E ** 2)
+        N = k * (E**2)
         filters = round(N)
         return int(filters)
 
     def calc_beamsize_from_lenses(self, filters, energy_eV):
         """Reversing calc_filters function to calculate vertical size from number of lenses"""
         E = energy_eV / 1000.0
-        k = filters / (E ** 2)
+        k = filters / (E**2)
         vertical = 53.85 / k - 198.0
         horizontal = self.calc_horizontal(vertical, energy_eV)
         return (round(horizontal, 1), round(vertical, 1))
 
     def calc_horizontal(self, vertical, energy_eV):
         # TODO horizontal:vertical ratio energy dependent?
-        ratio = 3.285 * (vertical ** -0.243)
+        ratio = 3.285 * (vertical**-0.243)
         return ratio * vertical
 
     def return_plot_and_fit(self, vertical_beamsize):
