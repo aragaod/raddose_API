@@ -14,19 +14,19 @@ free_space=$(/usr/bin/df -k /run/user/${uid}/raddose3d/cache/ --output=pcent|tai
 echo "Free space: $free_space %"
 if (( ${free_space} < 10 ));then
     echo "Deleting less agressively days"
-    /usr/bin/find /run/user/${uid}/raddose3d/cache -mtime +2 -exec rm -rf {} \;
+    /usr/bin/find /run/user/${uid}/raddose3d/cache -mtime +2 -not -path "/run/user/1007182/raddose3d/cache" -exec rm -rf {} \;
 elif (( ${free_space} < 25 ));then
     echo "Deleting less agressively hours"
-    /usr/bin/find /run/user/${uid}/raddose3d/cache -mmin +60 -exec rm -rf {} \;
+    /usr/bin/find /run/user/${uid}/raddose3d/cache -mmin +60 -not -path "/run/user/1007182/raddose3d/cache" -exec rm -rf {} \;
 elif (( ${free_space} < 50 ));then
     echo "Deleting more agressively tens of minutes"
-    /usr/bin/find /run/user/${uid}/raddose3d/cache -mmin +30 -exec rm -rf {} \;
+    /usr/bin/find /run/user/${uid}/raddose3d/cache -mmin +30 -not -path "/run/user/1007182/raddose3d/cache" -exec rm -rf {} \;
 elif (( ${free_space} < 75 ));then
     echo "Deleting more agressively 5 minutes"
-    /usr/bin/find /run/user/${uid}/raddose3d/cache -mmin +5 -exec rm -rf {} \;
+    /usr/bin/find /run/user/${uid}/raddose3d/cache -mmin +5 -not -path "/run/user/1007182/raddose3d/cache" -exec rm -rf {} \;
 elif (( ${free_space} < 90 ));then
     echo "Deleting more agressively one minute"
-    /usr/bin/find /run/user/${uid}/raddose3d/cache -mmin +1 -exec rm -rf {} \;
+    /usr/bin/find /run/user/${uid}/raddose3d/cache -mmin +1 -not -path "/run/user/1007182/raddose3d/cache" -exec rm -rf {} \;
 fi
 
 if  [ ! -d  /run/user/${uid}/raddose3d/cache/ ];then
