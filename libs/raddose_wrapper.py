@@ -16,6 +16,7 @@ from time import time
 from beamline import redis
 from beamline import ID
 
+
 class raddose:
     template = """
 ##############################################################################
@@ -56,8 +57,8 @@ Beam
 
 Type Gaussian             # Gaussian profile beam
 Flux {flux}               # in photons per second (2e12 = 2 * 10^12)
-FWHM {beam_size_x} {beam_size_y} #in µm, X and Y for a Gaussian beam
-                          # X=vertical and Y = horizontal for a 
+FWHM {beam_size_y} {beam_size_x} #in µm, X and Y for a Gaussian beam
+                          # Y=vertical and X = horizontal for a 
                           # horizontal goniometer
                           # Opposite for a vertical goniometer
 
@@ -66,8 +67,8 @@ Energy {photon_energy} KEV
 #Set the below for non DCM (e.g. DMM) in KeV
 {energy_bandpass_string}
 
-Collimation Rectangular 100 100 # 100 100 # X/Y collimation of the beam in µm
-                                # X = vertical and Y = horizontal for a
+Collimation Rectangular {collimation_y} {collimation_x} #100 100 # X/Y collimation of the beam in µm
+                                # Y = vertical and X = horizontal for a
                                 # horizontal goniometer
                                 # Opposite for a vertical goniometer
 
@@ -85,7 +86,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
 #AngularResolution 3     # Only change from the defaults when using very
                           # small wedges, e.g 5°.
     """
-    input_filename_template = "{size_x:.1f}_{size_y:.1f}_{size_z:.1f}_{comp_reso:.1f}_{unit_cell_a:.1f}_{unit_cell_b:.1f}_{unit_cell_c:.1f}_{number_of_monomers:d}_{number_of_residues:d}_{elements_protein_concentration:f}_{elements_solvent_concentration:f}_{solvent_fraction:.2f}_{flux:s}_{beam_size_x:.1f}_{beam_size_y:.1f}_{photon_energy:.2f}_{photon_energy_FWHM:.3f}_{oscillation_start:.1f}_{oscillation_end:.1f}_{total_exposure_time:.1f}.txt"
+    input_filename_template = "{size_x:.1f}_{size_y:.1f}_{size_z:.1f}_{comp_reso:.1f}_{unit_cell_a:.1f}_{unit_cell_b:.1f}_{unit_cell_c:.1f}_{number_of_monomers:d}_{number_of_residues:d}_{elements_protein_concentration:f}_{elements_solvent_concentration:f}_{solvent_fraction:.2f}_{flux:s}_{beam_size_x:.1f}_{beam_size_y:.1f}_{photon_energy:.2f}_{photon_energy_FWHM:.3f}_{oscillation_start:.1f}_{oscillation_end:.1f}_{total_exposure_time:.1f}_{collimation_y:.1f}_{collimation_x:.1f}.txt"
 
     def __init__(
         self,
@@ -111,9 +112,10 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
         total_exposure_time=90.0,
         prefix="output-",
         output_directory="/scratch/raddose3d/",
+        collimation_x=100,
+        collimation_y=100,
         verbose=False,
     ):
-
         self.size_x = size_x
         self.size_y = size_y
         self.size_z = size_z
@@ -136,6 +138,8 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
         self.total_exposure_time = total_exposure_time
         self.output_directory = output_directory
         self.prefix = prefix
+        self.collimation_x = collimation_x
+        self.collimation_y = collimation_y
         self.verbose = verbose
         self.expected_files = [
             "%sSummary.csv" % self.prefix,
@@ -167,15 +171,20 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
             "beam_size_x": self.beam_size_x,
             "beam_size_y": self.beam_size_y,
             "photon_energy": self.photon_energy,
-            "photon_energy_FWHM": self.photon_energy_FWHM, 
+            "photon_energy_FWHM": self.photon_energy_FWHM,
             "energy_bandpass_string": energy_bandpass_string,
             "oscillation_start": self.oscillation_start,
             "oscillation_end": self.oscillation_end,
             "total_exposure_time": self.total_exposure_time,
+            "collimation_x": self.collimation_x,
+            "collimation_y": self.collimation_y,
         }
         return parameters
 
     def get_input_filename(self):
+        from pprint import pprint
+
+        pprint(self.get_parameters())
         input_filename = os.path.join(
             self.output_directory,
             self.input_filename_template.format(**self.get_parameters()),
@@ -202,7 +211,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
 
     def get_raddose_binary_path(self):
         install_path = "/dls_sw/apps/raddose/3D-4.0/raddose3d.jar"
-        memory_path = os.path.join(self.get_output_directory(),"raddose3d.jar")
+        memory_path = os.path.join(self.get_output_directory(), "raddose3d.jar")
         if os.path.isfile(memory_path):
             return memory_path
         else:

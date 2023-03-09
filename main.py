@@ -133,6 +133,16 @@ def read_item(
     beam_size_y: float = Query(
         None, description="Beam vertical size (microns)", title="in microns"
     ),
+    collimation_x: float = Query(
+        None,
+        description="Horizontal collimation size (microns) assumes 100 ",
+        title="in microns",
+    ),
+    collimation_y: float = Query(
+        None,
+        description="Vertical Collimation size (microns) assumes 100",
+        title="in microns",
+    ),
     energy_kev: float = Query(None, description="X-ray energy (kev)", title="kev"),
     energy_bandpass_kev: float = Query(
         None, description="X-ray energy bandpass (kev) leave empty for DCM", title="kev"
@@ -147,7 +157,6 @@ def read_item(
         None, description="Total exposure for dataset (s)", title="seconds"
     ),
 ):
-
     original_dict = {
         "size_x": xtal_size_x,
         "size_y": xtal_size_y,
@@ -168,6 +177,8 @@ def read_item(
         "oscillation_start": oscillation_start,
         "oscillation_end": oscillation_end,
         "total_exposure_time": total_exposure_time,
+        "collimation_x": collimation_x,
+        "collimation_y": collimation_y,
     }
 
     filtered_nones = {k: v for k, v in original_dict.items() if v is not None}
@@ -245,7 +256,6 @@ def read_item(
         enum=["Max Dose", "Average DWD", "Dose Threshold", "AD-ExpRegion"],
     ),
 ):
-
     original_dict = {
         "size_x": xtal_size_x,
         "size_y": xtal_size_y,
@@ -282,7 +292,6 @@ def read_item(
     ),
     beamline: Beamlines = Query(None, description="MX beamline"),
 ):
-
     if beamline == "i03" or beamline == "i24" or beamline == "i04-1":
         print(str(beamline))
         print(type(beamline))
@@ -292,7 +301,7 @@ def read_item(
         print(str(beamline))
         return json.dumps(f"Energy outside range 6 KeV < {energy} < 18.0 Kev")
 
-    lookup = flux_bs_lookup(["i04:energy_flux:lookup:20220402b"])
+    lookup = flux_bs_lookup(["i04:energy_flux:lookup:20220714"])
 
     energy = energy * 1000
     print("Re-calculated polinomial fits")
@@ -329,7 +338,6 @@ def run_raddose3d(**kargs):
 
 
 def make_temporary_folder(temp_folder):
-
     try:
         os.makedirs(temp_folder)
         return temp_folder
@@ -351,7 +359,6 @@ def loop_raddose_until_target_dose(
     deadband=0.1,
     **kargs,
 ):
-
     # running first time with fixed exposure time
     kargs["total_exposure_time"] = starting_exposure
     new_exposure = starting_exposure
