@@ -3,6 +3,7 @@ Main daemon to run that setups up a HTTP restfull API for raddose3D java program
 """
 
 from fastapi import FastAPI, Query
+from typing import Union
 import subprocess, sys, json, uuid, os
 from libs.raddose_wrapper import raddose
 from libs.lookuptables import flux_bs_lookup
@@ -115,12 +116,8 @@ def read_item(
     number_of_residues: int = Query(
         None, description="Number of aminoacids", title="Integer"
     ),
-    elements_protein_concentration: float = Query(
-        None, description="Protein concentration (M)", title="Molar"
-    ),
-    elements_solvent_concentration: float = Query(
-        None, description="Crystallant concentration (M)", title="Molar"
-    ),
+    elements_protein_concentration: Union[str,None] = Query(default=None, description="Protein HA content", title="e.g. Zn 0.333 S 6", max_length=20),
+    elements_solvent_concentration: Union[str,None] = Query(default=None, description="HA concentration", title="e.g. P 425 (in nmol/l)", max_length=20),
     solvent_fraction: float = Query(
         None, description="Solvent content (fractional number)", title="fraction"
     ),

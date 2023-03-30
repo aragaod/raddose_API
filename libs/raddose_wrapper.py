@@ -12,6 +12,7 @@ import csv
 import pickle, json
 from pprint import pprint
 from time import time
+import hashlib
 
 from beamline import redis
 from beamline import ID
@@ -36,14 +37,19 @@ UnitCell  {unit_cell_a} {unit_cell_b} {unit_cell_c}  # unit cell size: a, b, c
                                 # alpha, beta and gamma angles default to 90°
 NumMonomers  {number_of_monomers}  # number of monomers in unit cell
 NumResidues  {number_of_residues}  # number of residues per monomer
-#ProteinHeavyAtoms {elements_protein_concentration} 
+
+#ProteinHeavyAtoms 
+{elements_protein_concentration} 
+
                                 #Zn 0.333 S 6  # heavy atoms added to protein part of the
                                 # monomer, i.e. S, coordinated metals,
                                 # Se in Se-Met
                                 # Note: If a sequence file is used S does not 
                                 # need to be added
                                 
-#SolventHeavyConc {elements_solvent_concentration} #P 425 concentration of elements in the solvent
+#SolventHeavyConc 
+{elements_solvent_concentration} 
+                                #P 425 concentration of elements in the solvent
                                 # in mmol/l. Oxygen and lighter elements
                                 # should not be specified
 SolventFraction {solvent_fraction} # fraction of the unit cell occupied by solvent
@@ -86,7 +92,7 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
 #AngularResolution 3     # Only change from the defaults when using very
                           # small wedges, e.g 5°.
     """
-    input_filename_template = "{size_x:.1f}_{size_y:.1f}_{size_z:.1f}_{comp_reso:.1f}_{unit_cell_a:.1f}_{unit_cell_b:.1f}_{unit_cell_c:.1f}_{number_of_monomers:d}_{number_of_residues:d}_{elements_protein_concentration:f}_{elements_solvent_concentration:f}_{solvent_fraction:.2f}_{flux:s}_{beam_size_x:.1f}_{beam_size_y:.1f}_{photon_energy:.2f}_{photon_energy_FWHM:.3f}_{oscillation_start:.1f}_{oscillation_end:.1f}_{total_exposure_time:.1f}_{collimation_y:.1f}_{collimation_x:.1f}.txt"
+    input_filename_template = "{size_x:.1f}_{size_y:.1f}_{size_z:.1f}_{comp_reso:.1f}_{unit_cell_a:.1f}_{unit_cell_b:.1f}_{unit_cell_c:.1f}_{number_of_monomers:d}_{number_of_residues:d}_{elements_protein_concentration}_{elements_solvent_concentration}_{solvent_fraction:.2f}_{flux:s}_{beam_size_x:.1f}_{beam_size_y:.1f}_{photon_energy:.2f}_{photon_energy_FWHM:.3f}_{oscillation_start:.1f}_{oscillation_end:.1f}_{total_exposure_time:.1f}_{collimation_y:.1f}_{collimation_x:.1f}.txt"
 
     def __init__(
         self,
@@ -154,6 +160,14 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
             energy_bandpass_string = f"ENERGYFWHM {self.photon_energy_FWHM} #bandpass assuming gaussian in KeV"
         else:
             energy_bandpass_string = f"#ENERGYFWHM not set"
+        if self.elements_protein_concentration:
+            elements_protein_concentration = f"ProteinHeavyAtoms {self.elements_protein_concentration}"
+        else:
+            elements_protein_concentration = "#ProteinHeavyAtoms NOT SET"
+        if self.elements_solvent_concentration:
+            elements_solvent_concentration = f"SolventHeavyConc {self.elements_solvent_concentration}"
+        else:
+            elements_solvent_concentration = "#SolventHeavyConc NOT SET"
         parameters = {
             "size_x": self.size_x,
             "size_y": self.size_y,
@@ -164,8 +178,8 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
             "unit_cell_c": self.unit_cell_c,
             "number_of_monomers": self.number_of_monomers,
             "number_of_residues": self.number_of_residues,
-            "elements_protein_concentration": self.elements_protein_concentration,
-            "elements_solvent_concentration": self.elements_solvent_concentration,
+            "elements_protein_concentration": elements_protein_concentration,
+            "elements_solvent_concentration": elements_solvent_concentration,
             "solvent_fraction": self.solvent_fraction,
             "flux": self.flux,
             "beam_size_x": self.beam_size_x,
@@ -184,10 +198,15 @@ ExposureTime {total_exposure_time} # Total time for entire angular range in seco
     def get_input_filename(self):
         from pprint import pprint
 
-        pprint(self.get_parameters())
+        params = self.get_parameters()
+        pprint(params)
+        if params.get("elements_protein_concentration"):
+            params["elements_protein_concentration"] = hashlib.md5(params["elements_protein_concentration"].encode('utf-8')).hexdigest()
+        if params.get("elements_protein_concentration"):
+            params["elements_solvent_concentration"] = hashlib.md5(params["elements_solvent_concentration"].encode('utf-8')).hexdigest()
         input_filename = os.path.join(
             self.output_directory,
-            self.input_filename_template.format(**self.get_parameters()),
+            self.input_filename_template.format(**params),
         )
         return input_filename
 
