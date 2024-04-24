@@ -294,11 +294,13 @@ def read_item(
         print(type(beamline))
         return json.dumps("Not implemented for that beamline yet")
 
-    if energy < 6.0 or energy > 18.0:
+    if energy < 6.0 or energy > 20.0:
         print(str(beamline))
-        return json.dumps(f"Energy outside range 6 KeV < {energy} < 18.0 Kev")
+        return json.dumps(f"Energy outside range 6 KeV < {energy} < 20.0 Kev")
 
-    lookup = flux_bs_lookup(["i04:energy_flux:lookup:20220714"])
+    redis_key = "i04:energy_flux:lookup:20240420c"
+    print(f"Redis key to read is {redis_key}")
+    lookup = flux_bs_lookup([redis_key])
 
     energy = energy * 1000
     print("Re-calculated polinomial fits")
